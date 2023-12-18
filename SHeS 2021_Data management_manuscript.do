@@ -19,10 +19,10 @@ graph drop _all
 **************************************************************
 *Assign values using global macros for file location and date
 **************************************************************
-global location "K:\DrJaacksGroup\FSS - Dietary Monitoring\SHeS\SHeS 2021" 
+global location "K:\DrJaacksGroup\FSS - Dietary Monitoring\SHeS\SHeS 2021\Current intakes paper" 
 global data `"$location\Data"'
 global output `"$location\Output"'
-global code `"$location\Code\Code for manuscript"'
+global code `"$location\Code"'
 global date "20231016"
 
 *Demographic data
