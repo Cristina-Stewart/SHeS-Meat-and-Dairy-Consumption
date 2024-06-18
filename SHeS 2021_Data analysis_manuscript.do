@@ -22,7 +22,7 @@ graph drop _all
 global location "K:\DrJaacksGroup\FSS - Dietary Monitoring\SHeS\SHeS 2021\Current intakes paper" 
 global data `"$location\Data"'
 global output `"$location\Output"'
-global date "20231016"
+global date "20240603"
 
 *Set maximum number of variables to 15,000
 set maxvar 15000
@@ -30,8 +30,7 @@ set maxvar 15000
 use "$data\SHeS 2021_participantlevel__manuscript_$date.dta", clear
 *Assign survey sampling variables
 svyset [pweight=SHeS_Intake24_wt_sc], psu(psu) strata(Strata)
-*Format P values to 4dp
-set pformat %5.4f
+
 
 *****************************
 *DEMOGRAPHIC CHARACTERISTICS
@@ -40,10 +39,8 @@ ta InIntake24 if age>=16
 
 ta TwoRecalls
 
-ta MeatConsumer DairyConsumer
-svy, subpop(intake24): ta MeatConsumer DairyConsumer, percent
+ta MeatConsumer DairyConsumer if intake24==1
 
-summ age if intake24==1
 svy, subpop(intake24): mean age
 
 ta Sex if intake24==1
@@ -119,7 +116,7 @@ svy, subpop(TwoRecalls): logit MeatConsumerDay2 i.MeatConsumerDay1, or
 	svy, subpop(intake24): prop RedMeatConsumer, over(Sex) percent
 	svy, subpop(intake24): prop RedMeatConsumer, over(age_cat) percent
 	svy, subpop(intake24): prop RedMeatConsumer, over(simd20_sga) percent
-	svy: logit RedMeatConsumer ib(2).Sex ib(1).age_cat ib(1).simd20_sga, or
+	svy, subpop(intake24): logit RedMeatConsumer ib(2).Sex ib(1).age_cat ib(1).simd20_sga, or
 
 	*White meat 
 	svy, subpop(intake24): prop WhiteMeatConsumer, over(Sex) percent
@@ -220,52 +217,52 @@ svy, subpop(intake24): mean Prop_Avg_Day_Beef Prop_Avg_Day_Pork Prop_Avg_Day_Lam
 
 *Differences in animal type across demographic subgroups
 	*Beef
-	svy, subpop(intake24): mean Prop_Avg_Day_Beef, over(Sex)
-	svy, subpop(intake24): mean Prop_Avg_Day_Beef, over(age_cat)
-	svy, subpop(intake24): mean Prop_Avg_Day_Beef, over(simd20_sga)
-	svy, subpop(intake24): reg Prop_Avg_Day_Beef ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef, over(Sex)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef, over(age_cat)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef, over(simd20_sga)
+	svy, subpop(MeatConsumer): reg Prop_Avg_Day_Beef ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
 	*Pork
-	svy, subpop(intake24): mean Prop_Avg_Day_Pork, over(Sex)
-	svy, subpop(intake24): mean Prop_Avg_Day_Pork, over(age_cat)
-	svy, subpop(intake24): mean Prop_Avg_Day_Pork, over(simd20_sga)
-	svy: reg Prop_Avg_Day_Pork ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Pork, over(Sex)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Pork, over(age_cat)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Pork, over(simd20_sga)
+	svy, subpop(MeatConsumer): reg Prop_Avg_Day_Pork ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
 	*Lamb
-	svy, subpop(intake24): mean Prop_Avg_Day_Lamb, over(Sex)
-	svy, subpop(intake24): mean Prop_Avg_Day_Lamb, over(age_cat)
-	svy, subpop(intake24): mean Prop_Avg_Day_Lamb, over(simd20_sga)
-	svy: reg Prop_Avg_Day_Lamb ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Lamb, over(Sex)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Lamb, over(age_cat)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Lamb, over(simd20_sga)
+	svy, subpop(MeatConsumer): reg Prop_Avg_Day_Lamb ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
 	*Poultry
-	svy, subpop(intake24): mean Prop_Avg_Day_Poultry, over(Sex)
-	svy, subpop(intake24): mean Prop_Avg_Day_Poultry, over(age_cat)
-	svy, subpop(intake24): mean Prop_Avg_Day_Poultry, over(simd20_sga)
-	svy: reg Prop_Avg_Day_Poultry ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Poultry, over(Sex)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Poultry, over(age_cat)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Poultry, over(simd20_sga)
+	svy, subpop(MeatConsumer): reg Prop_Avg_Day_Poultry ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
 	*Game
-	svy, subpop(intake24): mean Prop_Avg_Day_Game, over(Sex)
-	svy, subpop(intake24): mean Prop_Avg_Day_Game, over(age_cat)
-	svy, subpop(intake24): mean Prop_Avg_Day_Game, over(simd20_sga)
-	svy: reg Prop_Avg_Day_Game ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Game, over(Sex)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Game, over(age_cat)
+	svy, subpop(MeatConsumer): mean Prop_Avg_Day_Game, over(simd20_sga)
+	svy, subpop(MeatConsumer): reg Prop_Avg_Day_Game ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 
 
 
-***************************
-***************************
-*MILK PRODUCT CONSUMPTION
-***************************
-***************************
+*********************
+*********************
+*DAIRY CONSUMPTION
+*********************
+*********************
 
 *Mean daily intake of dairy products, per capita 
-svy, subpop(intake24): mean Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter
+svy, subpop(intake24): mean Avg_Day_Dairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_Cream Avg_Day_Butter
 
-*Differences in dairy product consumption across demographic subgroups, per capita
-	*Total milk products
-	svy, subpop(intake24): mean Avg_Day_TotDairy, over(Sex)
-	svy, subpop(intake24): mean Avg_Day_TotDairy, over(age_cat)
-	svy, subpop(intake24): mean Avg_Day_TotDairy, over(simd20_sga)
-	svy, subpop(intake24): reg Avg_Day_TotDairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+*Differences in dairy consumption across demographic subgroups, per capita
+	*Total dairy
+	svy, subpop(intake24): mean Avg_Day_Dairy, over(Sex)
+	svy, subpop(intake24): mean Avg_Day_Dairy, over(age_cat)
+	svy, subpop(intake24): mean Avg_Day_Dairy, over(simd20_sga)
+	svy, subpop(intake24): reg Avg_Day_Dairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
 	*Milk
 	svy, subpop(intake24): mean Avg_Day_Milk, over(Sex)
@@ -285,14 +282,31 @@ svy, subpop(intake24): mean Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_Day
 	svy, subpop(intake24): mean Avg_Day_Yogurt, over(simd20_sga)
 	svy, subpop(intake24): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 
+	*Cream
+	svy, subpop(intake24): mean Avg_Day_Cream, over(Sex)
+	svy, subpop(intake24): mean Avg_Day_Cream, over(age_cat)
+	svy, subpop(intake24): mean Avg_Day_Cream, over(simd20_sga)
+	svy, subpop(intake24): reg Avg_Day_Cream ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	
+	*Butter
+	svy, subpop(intake24): mean Avg_Day_Butter, over(Sex)
+	svy, subpop(intake24): mean Avg_Day_Butter, over(age_cat)
+	svy, subpop(intake24): mean Avg_Day_Butter, over(simd20_sga)
+	svy, subpop(intake24): reg Avg_Day_Butter ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+
 	
 *Proportion dairy consumers 
-ta DairyConsumer
-svy, subpop(intake24): prop DairyConsumer, percent
-svy, subpop(DairyConsumer): prop MeatConsumer 
-svy, subpop(DairyConsumer if NumberOfRecalls==2): prop DairyConsumerDays, percent
+svy, subpop(intake24): prop  DairyConsumer, percent
+ta DairyConsumer if intake24==1
 
-*Likelihood eating milk products on second recall if consumed on first recall
+svy, subpop(DairyConsumer): prop MeatConsumer, percent
+ta MeatConsumer if DairyConsumer==1
+
+	*Proportion of dairy consumers eating dairy on both days
+	ta DairyConsumer if NumberOfRecalls==2
+	svy, subpop(DairyConsumer if NumberOfRecalls==2): prop DairyConsumerDays, percent
+
+*Likelihood eating dairy on second recall if consumed on first recall
 svy, subpop(TwoRecalls): prop DairyConsumerDay2, over(DairyConsumerDay1)
 svy, subpop(TwoRecalls): logit DairyConsumerDay2 i.DairyConsumerDay1, or
 
@@ -303,33 +317,33 @@ svy, subpop(intake24): prop DairyConsumer, over(simd20_sga) percent
 svy, subpop(intake24): logit DairyConsumer ib(2).Sex ib(1).age_cat ib(1).simd20_sga, or
 
 *Mean daily intake of dairy products, among consumers
-svy, subpop(DairyConsumer): mean Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter
+svy, subpop(DairyConsumer): mean Avg_Day_Dairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_Cream Avg_Day_Butter
 
 *Differences in dairy product consumption across demographic subgroups, among consumers
-svy, subpop(DairyConsumer): reg Avg_Day_TotDairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+svy, subpop(DairyConsumer): reg Avg_Day_Dairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 svy, subpop(DairyConsumer): reg Avg_Day_Milk ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 svy, subpop(DairyConsumer): reg Avg_Day_Cheese ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 svy, subpop(DairyConsumer): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+svy, subpop(DairyConsumer): reg Avg_Day_Cream ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+svy, subpop(DairyConsumer): reg Avg_Day_Butter ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 
-*Sensitivity Analysis 1: Adjusting for mean daily energy intake
-svy, subpop(intake24): reg Avg_Day_TotDairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
+*Sensitivity Analysis 1: Adjusting for mean daily energy intake (per capita)
+svy, subpop(intake24): reg Avg_Day_Dairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
 svy, subpop(intake24): reg Avg_Day_Milk ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
 svy, subpop(intake24): reg Avg_Day_Cheese ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
 svy, subpop(intake24): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
-
+svy, subpop(intake24): reg Avg_Day_Cream ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
+svy, subpop(intake24): reg Avg_Day_Butter ib(2).Sex ib(1).age_cat ib(1).simd20_sga Avg_Day_Energykcal
 
 *Sensitivity Analysis 2: Excluding outliers
-	*Total milk products
-	summ Avg_Day_TotDairy [aweight=SHeS_Intake24_wt_sc]
-	local mean_TotDairy =r(mean)
-	local sd_TotDairy=r(sd)
-	gen notoutlier=1 if Avg_Day_TotDairy>(`mean_TotDairy'-2*`sd_TotDairy') | Avg_Day_TotDairy<(`mean_TotDairy'+2*`sd_TotDairy') & Avg_Day_TotDairy!=.
-	replace notoutlier=0 if Avg_Day_TotDairy<(`mean_TotDairy'-2*`sd_TotDairy') | Avg_Day_TotDairy>(`mean_TotDairy'+2*`sd_TotDairy') & Avg_Day_TotDairy!=.
+	*Total dairy
+	summ Avg_Day_Dairy [aweight=SHeS_Intake24_wt_sc]
+	local mean_Dairy =r(mean)
+	local sd_Dairy=r(sd)
+	gen notoutlier=1 if Avg_Day_Dairy>(`mean_Dairy'-2*`sd_Dairy') | Avg_Day_Dairy<(`mean_Dairy'+2*`sd_Dairy') & Avg_Day_Dairy!=.
+	replace notoutlier=0 if Avg_Day_Dairy<(`mean_Dairy'-2*`sd_Dairy') | Avg_Day_Dairy>(`mean_Dairy'+2*`sd_Dairy') & Avg_Day_Dairy!=.
 	
-	svy, subpop(notoutlier): mean Avg_Day_TotDairy, over(Sex)
-	svy, subpop(notoutlier): mean Avg_Day_TotDairy, over(age_cat)
-	svy, subpop(notoutlier): mean Avg_Day_TotDairy, over(simd20_sga)
-	svy, subpop(notoutlier): reg Avg_Day_TotDairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	svy, subpop(notoutlier): reg Avg_Day_Dairy ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	drop notoutlier
 	
 	*Milk
@@ -339,9 +353,6 @@ svy, subpop(intake24): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_s
 	gen notoutlier=1 if Avg_Day_Milk>(`mean_Milk'-2*`sd_Milk') | Avg_Day_Milk<(`mean_Milk'+2*`sd_Milk') & Avg_Day_Milk!=.
 	replace notoutlier=0 if Avg_Day_Milk<(`mean_Milk'-2*`sd_Milk') | Avg_Day_Milk>(`mean_Milk'+2*`sd_Milk') & Avg_Day_Milk!=.
 	
-	svy, subpop(notoutlier): mean Avg_Day_Milk, over(Sex)
-	svy, subpop(notoutlier): mean Avg_Day_Milk, over(age_cat)
-	svy, subpop(notoutlier): mean Avg_Day_Milk, over(simd20_sga)
 	svy, subpop(notoutlier): reg Avg_Day_Milk ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	drop notoutlier
 
@@ -352,9 +363,6 @@ svy, subpop(intake24): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_s
 	gen notoutlier=1 if Avg_Day_Cheese>(`mean_Cheese'-2*`sd_Cheese') | Avg_Day_Cheese<(`mean_Cheese'+2*`sd_Cheese') & Avg_Day_Cheese!=.
 	replace notoutlier=0 if Avg_Day_Cheese<(`mean_Cheese'-2*`sd_Cheese') | Avg_Day_Cheese>(`mean_Cheese'+2*`sd_Cheese') & Avg_Day_Cheese!=.
 	
-	svy, subpop(notoutlier): mean Avg_Day_Cheese, over(Sex)
-	svy, subpop(notoutlier): mean Avg_Day_Cheese, over(age_cat)
-	svy, subpop(notoutlier): mean Avg_Day_Cheese, over(simd20_sga)
 	svy, subpop(notoutlier): reg Avg_Day_Cheese ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	drop notoutlier
 
@@ -365,38 +373,72 @@ svy, subpop(intake24): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_s
 	gen notoutlier=1 if Avg_Day_Yogurt>(`mean_Yogurt'-2*`sd_Yogurt') | Avg_Day_Yogurt<(`mean_Yogurt'+2*`sd_Yogurt') & Avg_Day_Yogurt!=.
 	replace notoutlier=0 if Avg_Day_Yogurt<(`mean_Yogurt'-2*`sd_Yogurt') | Avg_Day_Yogurt>(`mean_Yogurt'+2*`sd_Yogurt') & Avg_Day_Yogurt!=.
 
-	svy, subpop(notoutlier): mean Avg_Day_Yogurt, over(Sex)
-	svy, subpop(notoutlier): mean Avg_Day_Yogurt, over(age_cat)
-	svy, subpop(notoutlier): mean Avg_Day_Yogurt, over(simd20_sga)
 	svy, subpop(notoutlier): reg Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	drop notoutlier
 
-*Proportion of milk products that is milk, cheese, yogurt, cream & dairy desserts, and butter
-svy, subpop(intake24): mean Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_CreamDesserts Prop_Avg_Day_Butter
+	*Cream
+	summ Avg_Day_Cream [aweight=SHeS_Intake24_wt_sc]
+	local mean_Cream =r(mean)
+	local sd_Cream=r(sd)
+	gen notoutlier=1 if Avg_Day_Cream>(`mean_Cream'-2*`sd_Cream') | Avg_Day_Cream<(`mean_Cream'+2*`sd_Cream') & Avg_Day_Cream!=.
+	replace notoutlier=0 if Avg_Day_Cream<(`mean_Cream'-2*`sd_Cream') | Avg_Day_Cream>(`mean_Cream'+2*`sd_Cream') & Avg_Day_Cream!=.
 
+	svy, subpop(notoutlier): reg Avg_Day_Cream ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	drop notoutlier
+
+	*Butter
+	summ Avg_Day_Butter [aweight=SHeS_Intake24_wt_sc]
+	local mean_Butter =r(mean)
+	local sd_Butter=r(sd)
+	gen notoutlier=1 if Avg_Day_Butter>(`mean_Butter'-2*`sd_Butter') | Avg_Day_Butter<(`mean_Butter'+2*`sd_Butter') & Avg_Day_Butter!=.
+	replace notoutlier=0 if Avg_Day_Butter<(`mean_Butter'-2*`sd_Butter') | Avg_Day_Butter>(`mean_Butter'+2*`sd_Butter') & Avg_Day_Butter!=.
+
+	svy, subpop(notoutlier): reg Avg_Day_Butter ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	drop notoutlier
+
+
+*Proportion of milk products that is milk, cheese, yogurt, cream, and butter
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_Cream Prop_Avg_Day_Butter
+
+*Differences in milk type across demographic subgroups
+	*Milk
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk, over(Sex)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk, over(age_cat)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk, over(simd20_sga)
+	svy, subpop(DairyConsumer): reg Prop_Avg_Day_Milk ib(2).Sex ib(1).age_cat ib(1).simd20_sga
 	
-*Low fat vs regular fat milk product consumption
+	*Cheese
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cheese, over(Sex)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cheese, over(age_cat)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cheese, over(simd20_sga)
+	svy, subpop(DairyConsumer): reg Prop_Avg_Day_Cheese ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	
+	*Yogurt
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Yogurt, over(Sex)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Yogurt, over(age_cat)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Yogurt, over(simd20_sga)
+	svy, subpop(DairyConsumer): reg Prop_Avg_Day_Yogurt ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	
+	*Cream
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cream, over(Sex)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cream, over(age_cat)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cream, over(simd20_sga)
+	svy, subpop(DairyConsumer): reg Prop_Avg_Day_Cream ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	
+	*Butter
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Butter, over(Sex)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Butter, over(age_cat)
+	svy, subpop(DairyConsumer): mean Prop_Avg_Day_Butter, over(simd20_sga)
+	svy, subpop(DairyConsumer): reg Prop_Avg_Day_Butter ib(2).Sex ib(1).age_cat ib(1).simd20_sga
+	
+*Low fat vs regular fat milk dairy consumption
 
 *Proportion of low fat dairy
-svy, subpop(DairyConsumer): mean Prop_Avg_Day_LFTotDairy 
-svy, subpop(DairyConsumer): mean Prop_Avg_Day_LFMilk 
-svy, subpop(DairyConsumer): mean Prop_Avg_Day_LFYogurt   
-svy, subpop(DairyConsumer): mean Prop_Avg_Day_LFCheese  
-
-*Split LF milk and yogurt consumption into ordinal variable 		
-gen LF_MilkYog_Cat=.
-replace LF_MilkYog_Cat=1 if Prop_Avg_Day_LFTotMilkYog>=0 & Prop_Avg_Day_LFTotMilkYog<=0.4 
-replace LF_MilkYog_Cat=2 if Prop_Avg_Day_LFTotMilkYog>=0.5 & Prop_Avg_Day_LFTotMilkYog<99.5
-replace LF_MilkYog_Cat=3 if Prop_Avg_Day_LFTotMilkYog>=99.5 & Prop_Avg_Day_LFTotMilkYog!=.
-
-*Ordinal regression to explore difference in LF milk and yogurt consumption
-svy, subpop(DairyConsumer): prop LF_MilkYog_Cat, percent 				
-svy, subpop(DairyConsumer): prop LF_MilkYog_Cat, over(Sex) percent
-svy, subpop(DairyConsumer): prop LF_MilkYog_Cat, over(age_cat) percent
-svy, subpop(DairyConsumer): prop LF_MilkYog_Cat, over(simd20_sga) percent
-svy, subpop(DairyConsumer): ologit LF_MilkYog_Cat ib(2).Sex ib(1).age_cat ib(1).simd20_sga, or 
- 
-
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Dairy_LF 
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk_LF 
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cheese_LF   
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Yogurt_LF  
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Cream_LF 
 
 **********************************************************************************
 **********************************************************************************
@@ -407,6 +449,7 @@ svy, subpop(DairyConsumer): ologit LF_MilkYog_Cat ib(2).Sex ib(1).age_cat ib(1).
 
 *Mean energy intake overall						
 svy, subpop(TwoRecalls): mean Avg_Day_Energykcal
+svy, subpop(TwoRecalls): mean Avg_Day_EnergykJ
 
 *Mean protein intake overall
 svy, subpop(TwoRecalls): mean Avg_Day_Proteing
@@ -426,6 +469,7 @@ svy, subpop(TwoRecalls): mean Avg_Day_Riboflavinmg, over(RNI_agesex)
 svy, subpop(TwoRecalls): mean Avg_Day_Niacin, over(RNI_agesex)
 svy, subpop(TwoRecalls): mean Avg_Day_VitaminB6mg, over(RNI_agesex)
 svy, subpop(TwoRecalls): mean Avg_Day_VitaminB12, over(RNI_agesex)
+svy, subpop(TwoRecalls): mean Avg_Day_VitaminD, over(RNI_agesex)
 
 *EARs for energy have different age/sex groups
 svy, subpop(TwoRecalls if Sex==1 & age >=15 & age <=18): mean Avg_Day_Energykcal
@@ -453,100 +497,100 @@ svy, subpop(TwoRecalls if Sex==2 & age >=75): mean Avg_Day_Energykcal
 *Meat 											
 
 *Bacon and ham 
-svy, subpop(intake24): mean Prop_Avg_Proteing_22 Prop_Avg_Fatg_22 Prop_Avg_Sodiummg_22 Prop_Avg_Calciummg_22 Prop_Avg_Phosphorusmg_22 Prop_Avg_Ironmg_22 Prop_Avg_Zincmg_22 Prop_Avg_Chloridemg_22 Prop_Avg_VitaminA_22 Prop_Avg_Riboflavinmg_22 Prop_Avg_Niacin_22 Prop_Avg_VitaminB6mg_22 Prop_Avg_VitaminB12_22 Prop_Avg_Iodine_22 Prop_Avg_Selenium_22 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_22 Prop_Avg_Fatg_22 Prop_Avg_Sodiummg_22 Prop_Avg_Calciummg_22 Prop_Avg_Phosphorusmg_22 Prop_Avg_Ironmg_22 Prop_Avg_Zincmg_22 Prop_Avg_Chloridemg_22 Prop_Avg_VitaminA_22 Prop_Avg_VitaminD_22 Prop_Avg_Riboflavinmg_22 Prop_Avg_Niacin_22 Prop_Avg_VitaminB6mg_22 Prop_Avg_VitaminB12_22 Prop_Avg_Iodine_22 Prop_Avg_Selenium_22  /*none contributed >4%*/
 
 *Beef dishes
-svy, subpop(intake24): mean Prop_Avg_Proteing_23 Prop_Avg_Fatg_23 Prop_Avg_Sodiummg_23 Prop_Avg_Calciummg_23 Prop_Avg_Phosphorusmg_23 Prop_Avg_Ironmg_23 Prop_Avg_Zincmg_23 Prop_Avg_Chloridemg_23 Prop_Avg_VitaminA_23 Prop_Avg_Riboflavinmg_23 Prop_Avg_Niacin_23 Prop_Avg_VitaminB6mg_23 Prop_Avg_VitaminB12_23 Prop_Avg_Iodine_23 Prop_Avg_Selenium_23
+svy, subpop(intake24): mean Prop_Avg_Proteing_23 Prop_Avg_Fatg_23 Prop_Avg_Sodiummg_23 Prop_Avg_Calciummg_23 Prop_Avg_Phosphorusmg_23 Prop_Avg_Ironmg_23 Prop_Avg_Zincmg_23 Prop_Avg_Chloridemg_23 Prop_Avg_VitaminA_23 Prop_Avg_VitaminD_23 Prop_Avg_Riboflavinmg_23 Prop_Avg_Niacin_23 Prop_Avg_VitaminB6mg_23 Prop_Avg_VitaminB12_23 Prop_Avg_Iodine_23 Prop_Avg_Selenium_23
 
 *Lamb dishes
-svy, subpop(intake24): mean Prop_Avg_Proteing_24 Prop_Avg_Fatg_24 Prop_Avg_Sodiummg_24 Prop_Avg_Calciummg_24 Prop_Avg_Phosphorusmg_24 Prop_Avg_Ironmg_24 Prop_Avg_Zincmg_24 Prop_Avg_Chloridemg_24 Prop_Avg_VitaminA_24 Prop_Avg_Riboflavinmg_24 Prop_Avg_Niacin_24 Prop_Avg_VitaminB6mg_24 Prop_Avg_VitaminB12_24 Prop_Avg_Iodine_24 Prop_Avg_Selenium_24 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_24 Prop_Avg_Fatg_24 Prop_Avg_Sodiummg_24 Prop_Avg_Calciummg_24 Prop_Avg_Phosphorusmg_24 Prop_Avg_Ironmg_24 Prop_Avg_Zincmg_24 Prop_Avg_Chloridemg_24 Prop_Avg_VitaminA_24 Prop_Avg_VitaminD_24 Prop_Avg_Riboflavinmg_24 Prop_Avg_Niacin_24 Prop_Avg_VitaminB6mg_24 Prop_Avg_VitaminB12_24 Prop_Avg_Iodine_24 Prop_Avg_Selenium_24 /*none contributed >4%*/
 
 *Pork dishes 
-svy, subpop(intake24): mean Prop_Avg_Proteing_25 Prop_Avg_Fatg_25 Prop_Avg_Sodiummg_25 Prop_Avg_Calciummg_25 Prop_Avg_Phosphorusmg_25 Prop_Avg_Ironmg_25 Prop_Avg_Zincmg_25 Prop_Avg_Chloridemg_25 Prop_Avg_VitaminA_25 Prop_Avg_Riboflavinmg_25 Prop_Avg_Niacin_25 Prop_Avg_VitaminB6mg_25 Prop_Avg_VitaminB12_25 Prop_Avg_Iodine_25 Prop_Avg_Selenium_25 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_25 Prop_Avg_Fatg_25 Prop_Avg_Sodiummg_25 Prop_Avg_Calciummg_25 Prop_Avg_Phosphorusmg_25 Prop_Avg_Ironmg_25 Prop_Avg_Zincmg_25 Prop_Avg_Chloridemg_25 Prop_Avg_VitaminA_25 Prop_Avg_VitaminD_25 Prop_Avg_Riboflavinmg_25 Prop_Avg_Niacin_25 Prop_Avg_VitaminB6mg_25 Prop_Avg_VitaminB12_25 Prop_Avg_Iodine_25 Prop_Avg_Selenium_25 /*none contributed >4%*/
 
 *Coated chicken
-svy, subpop(intake24): mean Prop_Avg_Proteing_26 Prop_Avg_Fatg_26 Prop_Avg_Sodiummg_26 Prop_Avg_Calciummg_26 Prop_Avg_Phosphorusmg_26 Prop_Avg_Ironmg_26 Prop_Avg_Zincmg_26 Prop_Avg_Chloridemg_26 Prop_Avg_VitaminA_26 Prop_Avg_Riboflavinmg_26 Prop_Avg_Niacin_26 Prop_Avg_VitaminB6mg_26 Prop_Avg_VitaminB12_26 Prop_Avg_Iodine_26 Prop_Avg_Selenium_26 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_26 Prop_Avg_Fatg_26 Prop_Avg_Sodiummg_26 Prop_Avg_Calciummg_26 Prop_Avg_Phosphorusmg_26 Prop_Avg_Ironmg_26 Prop_Avg_Zincmg_26 Prop_Avg_Chloridemg_26 Prop_Avg_VitaminA_26 Prop_Avg_VitaminD_26 Prop_Avg_Riboflavinmg_26 Prop_Avg_Niacin_26 Prop_Avg_VitaminB6mg_26 Prop_Avg_VitaminB12_26 Prop_Avg_Iodine_26 Prop_Avg_Selenium_26 /*none contributed >4%*/
 
 *Chicken dishes
-svy, subpop(intake24): mean Prop_Avg_Proteing_27 Prop_Avg_Fatg_27 Prop_Avg_Sodiummg_27 Prop_Avg_Calciummg_27 Prop_Avg_Phosphorusmg_27 Prop_Avg_Ironmg_27 Prop_Avg_Zincmg_27 Prop_Avg_Chloridemg_27 Prop_Avg_VitaminA_27 Prop_Avg_Riboflavinmg_27 Prop_Avg_Niacin_27 Prop_Avg_VitaminB6mg_27 Prop_Avg_VitaminB12_27 Prop_Avg_Iodine_27 Prop_Avg_Selenium_27
+svy, subpop(intake24): mean Prop_Avg_Proteing_27 Prop_Avg_Fatg_27 Prop_Avg_Sodiummg_27 Prop_Avg_Calciummg_27 Prop_Avg_Phosphorusmg_27 Prop_Avg_Ironmg_27 Prop_Avg_Zincmg_27 Prop_Avg_Chloridemg_27 Prop_Avg_VitaminA_27 Prop_Avg_VitaminD_27 Prop_Avg_Riboflavinmg_27 Prop_Avg_Niacin_27 Prop_Avg_VitaminB6mg_27 Prop_Avg_VitaminB12_27 Prop_Avg_Iodine_27 Prop_Avg_Selenium_27
 
 *Liver dishes
-svy, subpop(intake24): mean Prop_Avg_Proteing_28 Prop_Avg_Fatg_28 Prop_Avg_Sodiummg_28 Prop_Avg_Calciummg_28 Prop_Avg_Phosphorusmg_28 Prop_Avg_Ironmg_28 Prop_Avg_Zincmg_28 Prop_Avg_Chloridemg_28 Prop_Avg_VitaminA_28 Prop_Avg_Riboflavinmg_28 Prop_Avg_Niacin_28 Prop_Avg_VitaminB6mg_28 Prop_Avg_VitaminB12_28 Prop_Avg_Iodine_28 Prop_Avg_Selenium_28 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_28 Prop_Avg_Fatg_28 Prop_Avg_Sodiummg_28 Prop_Avg_Calciummg_28 Prop_Avg_Phosphorusmg_28 Prop_Avg_Ironmg_28 Prop_Avg_Zincmg_28 Prop_Avg_Chloridemg_28 Prop_Avg_VitaminA_28 Prop_Avg_VitaminD_28 Prop_Avg_Riboflavinmg_28 Prop_Avg_Niacin_28 Prop_Avg_VitaminB6mg_28 Prop_Avg_VitaminB12_28 Prop_Avg_Iodine_28 Prop_Avg_Selenium_28 /*none contributed >4%*/
 
 *Burgers
-svy, subpop(intake24): mean Prop_Avg_Proteing_29 Prop_Avg_Fatg_29 Prop_Avg_Sodiummg_29 Prop_Avg_Calciummg_29 Prop_Avg_Phosphorusmg_29 Prop_Avg_Ironmg_29 Prop_Avg_Zincmg_29 Prop_Avg_Chloridemg_29 Prop_Avg_VitaminA_29 Prop_Avg_Riboflavinmg_29 Prop_Avg_Niacin_29 Prop_Avg_VitaminB6mg_29 Prop_Avg_VitaminB12_29 Prop_Avg_Iodine_29 Prop_Avg_Selenium_29 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_29 Prop_Avg_Fatg_29 Prop_Avg_Sodiummg_29 Prop_Avg_Calciummg_29 Prop_Avg_Phosphorusmg_29 Prop_Avg_Ironmg_29 Prop_Avg_Zincmg_29 Prop_Avg_Chloridemg_29 Prop_Avg_VitaminA_29 Prop_Avg_VitaminD_29 Prop_Avg_Riboflavinmg_29 Prop_Avg_Niacin_29 Prop_Avg_VitaminB6mg_29 Prop_Avg_VitaminB12_29 Prop_Avg_Iodine_29 Prop_Avg_Selenium_29 /*none contributed >4%*/
 
 *Sausages
-svy, subpop(intake24): mean Prop_Avg_Proteing_30 Prop_Avg_Fatg_30 Prop_Avg_Sodiummg_30 Prop_Avg_Calciummg_30 Prop_Avg_Phosphorusmg_30 Prop_Avg_Ironmg_30 Prop_Avg_Zincmg_30 Prop_Avg_Chloridemg_30 Prop_Avg_VitaminA_30 Prop_Avg_Riboflavinmg_30 Prop_Avg_Niacin_30 Prop_Avg_VitaminB6mg_30 Prop_Avg_VitaminB12_30 Prop_Avg_Iodine_30 Prop_Avg_Selenium_30 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_30 Prop_Avg_Fatg_30 Prop_Avg_Sodiummg_30 Prop_Avg_Calciummg_30 Prop_Avg_Phosphorusmg_30 Prop_Avg_Ironmg_30 Prop_Avg_Zincmg_30 Prop_Avg_Chloridemg_30 Prop_Avg_VitaminA_30 Prop_Avg_VitaminD_30 Prop_Avg_Riboflavinmg_30 Prop_Avg_Niacin_30 Prop_Avg_VitaminB6mg_30 Prop_Avg_VitaminB12_30 Prop_Avg_Iodine_30 Prop_Avg_Selenium_30 /*none contributed >4%*/
 
 *Meat pies
-svy, subpop(intake24): mean Prop_Avg_Proteing_31 Prop_Avg_Fatg_31 Prop_Avg_Sodiummg_31 Prop_Avg_Calciummg_31 Prop_Avg_Phosphorusmg_31 Prop_Avg_Ironmg_31 Prop_Avg_Zincmg_31 Prop_Avg_Chloridemg_31 Prop_Avg_VitaminA_31 Prop_Avg_Riboflavinmg_31 Prop_Avg_Niacin_31 Prop_Avg_VitaminB6mg_31 Prop_Avg_VitaminB12_31 Prop_Avg_Iodine_31 Prop_Avg_Selenium_31 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_31 Prop_Avg_Fatg_31 Prop_Avg_Sodiummg_31 Prop_Avg_Calciummg_31 Prop_Avg_Phosphorusmg_31 Prop_Avg_Ironmg_31 Prop_Avg_Zincmg_31 Prop_Avg_Chloridemg_31 Prop_Avg_VitaminA_31 Prop_Avg_VitaminD_31 Prop_Avg_Riboflavinmg_31 Prop_Avg_Niacin_31 Prop_Avg_VitaminB6mg_31 Prop_Avg_VitaminB12_31 Prop_Avg_Iodine_31 Prop_Avg_Selenium_31 /*none contributed >4%*/
 
 *Other meat products
-svy, subpop(intake24): mean Prop_Avg_Proteing_32 Prop_Avg_Fatg_32 Prop_Avg_Sodiummg_32 Prop_Avg_Calciummg_32 Prop_Avg_Phosphorusmg_32 Prop_Avg_Ironmg_32 Prop_Avg_Zincmg_32 Prop_Avg_Chloridemg_32 Prop_Avg_VitaminA_32 Prop_Avg_Riboflavinmg_32 Prop_Avg_Niacin_32 Prop_Avg_VitaminB6mg_32 Prop_Avg_VitaminB12_32 Prop_Avg_Iodine_32 Prop_Avg_Selenium_32 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_32 Prop_Avg_Fatg_32 Prop_Avg_Sodiummg_32 Prop_Avg_Calciummg_32 Prop_Avg_Phosphorusmg_32 Prop_Avg_Ironmg_32 Prop_Avg_Zincmg_32 Prop_Avg_Chloridemg_32 Prop_Avg_VitaminA_32 Prop_Avg_VitaminD_32 Prop_Avg_Riboflavinmg_32 Prop_Avg_Niacin_32 Prop_Avg_VitaminB6mg_32 Prop_Avg_VitaminB12_32 Prop_Avg_Iodine_32 Prop_Avg_Selenium_32 /*none contributed >4%*/
 
 
-***THOSE ABOVE 5%***
+***THOSE ABOVE 4%***
 
 **Beef dishes 
 *Main food group					
-svy, subpop(intake24): mean Prop_Avg_Proteing_23 Prop_Avg_Zincmg_23 Prop_Avg_Niacin_23 Prop_Avg_VitaminB6mg_23 Prop_Avg_VitaminB12_23
+svy, subpop(intake24): mean Prop_Avg_Proteing_23 Prop_Avg_Ironmg_23 Prop_Avg_Zincmg_23 Prop_Avg_VitaminD_23 Prop_Avg_Niacin_23 Prop_Avg_VitaminB6mg_23 Prop_Avg_VitaminB12_23 Prop_Avg_Selenium_23
 
 *Sub food groups
-svy, subpop(intake24): mean Prop_Avg_Proteing_23A Prop_Avg_Zincmg_23A Prop_Avg_Niacin_23A Prop_Avg_VitaminB6mg_23A Prop_Avg_VitaminB12_23A Prop_Avg_Proteing_23B Prop_Avg_Zincmg_23B Prop_Avg_Niacin_23B Prop_Avg_VitaminB6mg_23B Prop_Avg_VitaminB12_23B
+svy, subpop(intake24): mean Prop_Avg_Proteing_23A Prop_Avg_Ironmg_23A Prop_Avg_Zincmg_23A Prop_Avg_VitaminD_23A Prop_Avg_Niacin_23A Prop_Avg_VitaminB6mg_23A Prop_Avg_VitaminB12_23A Prop_Avg_Selenium_23A Prop_Avg_Proteing_23B Prop_Avg_Ironmg_23B Prop_Avg_Zincmg_23B Prop_Avg_VitaminD_23B Prop_Avg_Niacin_23B Prop_Avg_VitaminB6mg_23B Prop_Avg_VitaminB12_23B Prop_Avg_Selenium_23B
 
 **Chicken dishes
 *Main food group
-svy, subpop(intake24): mean Prop_Avg_Proteing_27 Prop_Avg_Phosphorusmg_27 Prop_Avg_Zincmg_27 Prop_Avg_Niacin_27 Prop_Avg_VitaminB6mg_27 Prop_Avg_Selenium_27 
+svy, subpop(intake24): mean Prop_Avg_Proteing_27 Prop_Avg_Fatg_27 Prop_Avg_Sodiummg_27  Prop_Avg_Phosphorusmg_27 Prop_Avg_Ironmg_27 Prop_Avg_Zincmg_27 Prop_Avg_VitaminD_27 Prop_Avg_Riboflavinmg_27 Prop_Avg_Niacin_27 Prop_Avg_VitaminB6mg_27 Prop_Avg_Selenium_27 
 
 *Sub food group
-svy, subpop(intake24): mean Prop_Avg_Proteing_27A Prop_Avg_Phosphorusmg_27A Prop_Avg_Zincmg_27A Prop_Avg_Niacin_27A Prop_Avg_VitaminB6mg_27A Prop_Avg_Selenium_27A Prop_Avg_Proteing_27B Prop_Avg_Phosphorusmg_27B Prop_Avg_Zincmg_27B Prop_Avg_Niacin_27B Prop_Avg_VitaminB6mg_27B Prop_Avg_Selenium_27B 
+svy, subpop(intake24): mean Prop_Avg_Proteing_27A Prop_Avg_Fatg_27A Prop_Avg_Sodiummg_27A Prop_Avg_Phosphorusmg_27A Prop_Avg_Ironmg_27A Prop_Avg_Zincmg_27A Prop_Avg_VitaminD_27A Prop_Avg_Riboflavinmg_27A Prop_Avg_Niacin_27A Prop_Avg_VitaminB6mg_27A Prop_Avg_Selenium_27A Prop_Avg_Proteing_27B Prop_Avg_Fatg_27B Prop_Avg_Sodiummg_27B  Prop_Avg_Phosphorusmg_27B Prop_Avg_Ironmg_27B Prop_Avg_Zincmg_27B Prop_Avg_VitaminD_27B Prop_Avg_Riboflavinmg_27B Prop_Avg_Niacin_27B Prop_Avg_VitaminB6mg_27B Prop_Avg_Selenium_27B 
 
 
 *Milk products
 
 *Whole milk
-svy, subpop(intake24): mean Prop_Avg_Proteing_10 Prop_Avg_Fatg_10 Prop_Avg_Sodiummg_10 Prop_Avg_Calciummg_10 Prop_Avg_Phosphorusmg_10 Prop_Avg_Ironmg_10 Prop_Avg_Zincmg_10 Prop_Avg_Chloridemg_10 Prop_Avg_VitaminA_10 Prop_Avg_Riboflavinmg_10 Prop_Avg_Niacin_10 Prop_Avg_VitaminB6mg_10 Prop_Avg_VitaminB12_10 Prop_Avg_Iodine_10 Prop_Avg_Selenium_10
+svy, subpop(intake24): mean Prop_Avg_Proteing_10 Prop_Avg_Fatg_10 Prop_Avg_Sodiummg_10 Prop_Avg_Calciummg_10 Prop_Avg_Phosphorusmg_10 Prop_Avg_Ironmg_10 Prop_Avg_Zincmg_10 Prop_Avg_Chloridemg_10 Prop_Avg_VitaminA_10 Prop_Avg_VitaminD_10 Prop_Avg_Riboflavinmg_10 Prop_Avg_Niacin_10 Prop_Avg_VitaminB6mg_10 Prop_Avg_VitaminB12_10 Prop_Avg_Iodine_10 Prop_Avg_Selenium_10
 
 *Semi-skimmed milk
-svy, subpop(intake24): mean Prop_Avg_Proteing_11 Prop_Avg_Fatg_11 Prop_Avg_Sodiummg_11 Prop_Avg_Calciummg_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_Ironmg_11 Prop_Avg_Zincmg_11 Prop_Avg_Chloridemg_11 Prop_Avg_VitaminA_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_Niacin_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 Prop_Avg_Iodine_11 Prop_Avg_Selenium_11
+svy, subpop(intake24): mean Prop_Avg_Proteing_11 Prop_Avg_Fatg_11 Prop_Avg_Sodiummg_11 Prop_Avg_Calciummg_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_Ironmg_11 Prop_Avg_Zincmg_11 Prop_Avg_Chloridemg_11 Prop_Avg_VitaminA_11 Prop_Avg_VitaminD_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_Niacin_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 Prop_Avg_Iodine_11 Prop_Avg_Selenium_11
 
 *1% milk
-svy, subpop(intake24): mean Prop_Avg_Proteing_60 Prop_Avg_Fatg_60 Prop_Avg_Sodiummg_60 Prop_Avg_Calciummg_60 Prop_Avg_Phosphorusmg_60 Prop_Avg_Ironmg_60 Prop_Avg_Zincmg_60 Prop_Avg_Chloridemg_60 Prop_Avg_VitaminA_60 Prop_Avg_Riboflavinmg_60 Prop_Avg_Niacin_60 Prop_Avg_VitaminB6mg_60 Prop_Avg_VitaminB12_60 Prop_Avg_Iodine_60 Prop_Avg_Selenium_60 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_60 Prop_Avg_Fatg_60 Prop_Avg_Sodiummg_60 Prop_Avg_Calciummg_60 Prop_Avg_Phosphorusmg_60 Prop_Avg_Ironmg_60 Prop_Avg_Zincmg_60 Prop_Avg_Chloridemg_60 Prop_Avg_VitaminA_60 Prop_Avg_VitaminD_60 Prop_Avg_Riboflavinmg_60 Prop_Avg_Niacin_60 Prop_Avg_VitaminB6mg_60 Prop_Avg_VitaminB12_60 Prop_Avg_Iodine_60 Prop_Avg_Selenium_60 /*none contributed >4%*/
 
 *Skimmed milk
-svy, subpop(intake24): mean Prop_Avg_Proteing_12 Prop_Avg_Fatg_12 Prop_Avg_Sodiummg_12 Prop_Avg_Calciummg_12 Prop_Avg_Phosphorusmg_12 Prop_Avg_Ironmg_12 Prop_Avg_Zincmg_12 Prop_Avg_Chloridemg_12 Prop_Avg_VitaminA_12 Prop_Avg_Riboflavinmg_12 Prop_Avg_Niacin_12 Prop_Avg_VitaminB6mg_12 Prop_Avg_VitaminB12_12 Prop_Avg_Iodine_12 Prop_Avg_Selenium_12 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_12 Prop_Avg_Fatg_12 Prop_Avg_Sodiummg_12 Prop_Avg_Calciummg_12 Prop_Avg_Phosphorusmg_12 Prop_Avg_Ironmg_12 Prop_Avg_Zincmg_12 Prop_Avg_Chloridemg_12 Prop_Avg_VitaminA_12 Prop_Avg_VitaminD_12 Prop_Avg_Riboflavinmg_12 Prop_Avg_Niacin_12 Prop_Avg_VitaminB6mg_12 Prop_Avg_VitaminB12_12 Prop_Avg_Iodine_12 Prop_Avg_Selenium_12 /*none contributed >4%*/
 
 *Other milk and cream 
-svy, subpop(intake24): mean Prop_Avg_Proteing_13 Prop_Avg_Fatg_13 Prop_Avg_Sodiummg_13 Prop_Avg_Calciummg_13 Prop_Avg_Phosphorusmg_13 Prop_Avg_Ironmg_13 Prop_Avg_Zincmg_13 Prop_Avg_Chloridemg_13 Prop_Avg_VitaminA_13 Prop_Avg_Riboflavinmg_13 Prop_Avg_Niacin_13 Prop_Avg_VitaminB6mg_13 Prop_Avg_VitaminB12_13 Prop_Avg_Iodine_13 Prop_Avg_Selenium_13
+svy, subpop(intake24): mean Prop_Avg_Proteing_13 Prop_Avg_Fatg_13 Prop_Avg_Sodiummg_13 Prop_Avg_Calciummg_13 Prop_Avg_Phosphorusmg_13 Prop_Avg_Ironmg_13 Prop_Avg_Zincmg_13 Prop_Avg_Chloridemg_13 Prop_Avg_VitaminA_13 Prop_Avg_VitaminD_13 Prop_Avg_Riboflavinmg_13 Prop_Avg_Niacin_13 Prop_Avg_VitaminB6mg_13 Prop_Avg_VitaminB12_13 Prop_Avg_Iodine_13 Prop_Avg_Selenium_13
 
 *Cheese
-svy, subpop(intake24): mean Prop_Avg_Proteing_14 Prop_Avg_Fatg_14 Prop_Avg_Sodiummg_14 Prop_Avg_Calciummg_14 Prop_Avg_Phosphorusmg_14 Prop_Avg_Ironmg_14 Prop_Avg_Zincmg_14 Prop_Avg_Chloridemg_14 Prop_Avg_VitaminA_14 Prop_Avg_Riboflavinmg_14 Prop_Avg_Niacin_14 Prop_Avg_VitaminB6mg_14 Prop_Avg_VitaminB12_14 Prop_Avg_Iodine_14 Prop_Avg_Selenium_14
+svy, subpop(intake24): mean Prop_Avg_Proteing_14 Prop_Avg_Fatg_14 Prop_Avg_Sodiummg_14 Prop_Avg_Calciummg_14 Prop_Avg_Phosphorusmg_14 Prop_Avg_Ironmg_14 Prop_Avg_Zincmg_14 Prop_Avg_Chloridemg_14 Prop_Avg_VitaminA_14 Prop_Avg_VitaminD_14 Prop_Avg_Riboflavinmg_14 Prop_Avg_Niacin_14 Prop_Avg_VitaminB6mg_14 Prop_Avg_VitaminB12_14 Prop_Avg_Iodine_14 Prop_Avg_Selenium_14
 
 *Yogurt, fromage frais and other dairy desserts
-svy, subpop(intake24): mean Prop_Avg_Proteing_15 Prop_Avg_Fatg_15 Prop_Avg_Sodiummg_15 Prop_Avg_Calciummg_15 Prop_Avg_Phosphorusmg_15 Prop_Avg_Ironmg_15 Prop_Avg_Zincmg_15 Prop_Avg_Chloridemg_15 Prop_Avg_VitaminA_15 Prop_Avg_Riboflavinmg_15 Prop_Avg_Niacin_15 Prop_Avg_VitaminB6mg_15 Prop_Avg_VitaminB12_15 Prop_Avg_Iodine_15 Prop_Avg_Selenium_15
+svy, subpop(intake24): mean Prop_Avg_Proteing_15 Prop_Avg_Fatg_15 Prop_Avg_Sodiummg_15 Prop_Avg_Calciummg_15 Prop_Avg_Phosphorusmg_15 Prop_Avg_Ironmg_15 Prop_Avg_Zincmg_15 Prop_Avg_Chloridemg_15 Prop_Avg_VitaminA_15 Prop_Avg_VitaminD_15 Prop_Avg_Riboflavinmg_15 Prop_Avg_Niacin_15 Prop_Avg_VitaminB6mg_15 Prop_Avg_VitaminB12_15 Prop_Avg_Iodine_15 Prop_Avg_Selenium_15
 
 *Ice cream
-svy, subpop(intake24): mean Prop_Avg_Proteing_53 Prop_Avg_Fatg_53 Prop_Avg_Sodiummg_53 Prop_Avg_Calciummg_53 Prop_Avg_Phosphorusmg_53 Prop_Avg_Ironmg_53 Prop_Avg_Zincmg_53 Prop_Avg_Chloridemg_53 Prop_Avg_VitaminA_53 Prop_Avg_Riboflavinmg_53 Prop_Avg_Niacin_53 Prop_Avg_VitaminB6mg_53 Prop_Avg_VitaminB12_53 Prop_Avg_Iodine_53 Prop_Avg_Selenium_53 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_53 Prop_Avg_Fatg_53 Prop_Avg_Sodiummg_53 Prop_Avg_Calciummg_53 Prop_Avg_Phosphorusmg_53 Prop_Avg_Ironmg_53 Prop_Avg_Zincmg_53 Prop_Avg_Chloridemg_53 Prop_Avg_VitaminA_53 Prop_Avg_VitaminD_53 Prop_Avg_Riboflavinmg_53 Prop_Avg_Niacin_53 Prop_Avg_VitaminB6mg_53 Prop_Avg_VitaminB12_53 Prop_Avg_Iodine_53 Prop_Avg_Selenium_53 /*none contributed >=5%*/
 
 *Butter
-svy, subpop(intake24): mean Prop_Avg_Proteing_17 Prop_Avg_Fatg_17 Prop_Avg_Sodiummg_17 Prop_Avg_Calciummg_17 Prop_Avg_Phosphorusmg_17 Prop_Avg_Ironmg_17 Prop_Avg_Zincmg_17 Prop_Avg_Chloridemg_17 Prop_Avg_VitaminA_17 Prop_Avg_Riboflavinmg_17 Prop_Avg_Niacin_17 Prop_Avg_VitaminB6mg_17 Prop_Avg_VitaminB12_17 Prop_Avg_Iodine_17 Prop_Avg_Selenium_17 /*none contributed >=5%*/
+svy, subpop(intake24): mean Prop_Avg_Proteing_17 Prop_Avg_Fatg_17 Prop_Avg_Sodiummg_17 Prop_Avg_Calciummg_17 Prop_Avg_Phosphorusmg_17 Prop_Avg_Ironmg_17 Prop_Avg_Zincmg_17 Prop_Avg_Chloridemg_17 Prop_Avg_VitaminA_17 Prop_Avg_VitaminD_17 Prop_Avg_Riboflavinmg_17 Prop_Avg_Niacin_17 Prop_Avg_VitaminB6mg_17 Prop_Avg_VitaminB12_17 Prop_Avg_Iodine_17 Prop_Avg_Selenium_17 /*none contributed >=5%*/
 
-***THOSE ABOVE 5%***
+***THOSE ABOVE 4%***
 *Whole milk
-svy, subpop(intake24): mean Prop_Avg_Iodine_10
+svy, subpop(intake24): mean Prop_Avg_Iodine_10 Prop_Avg_VitaminB12_10 
 
 *Semi-skimmed milk
-svy, subpop(intake24): mean Prop_Avg_Calciummg_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 Prop_Avg_Iodine_11 
+svy, subpop(intake24): mean Prop_Avg_Proteing_11 Prop_Avg_Calciummg_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_Zincmg_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 Prop_Avg_Iodine_11 
 
 *Other milk and cream
 svy, subpop(intake24): mean Prop_Avg_Calciummg_13 Prop_Avg_Riboflavinmg_13 Prop_Avg_VitaminB12_13 Prop_Avg_Iodine_13
 
 *Cheese
-svy, subpop(intake24): mean Prop_Avg_Calciummg_14 Prop_Avg_VitaminA_14 Prop_Avg_VitaminB12_14
+svy, subpop(intake24): mean Prop_Avg_Fatg_14 Prop_Avg_Calciummg_14 Prop_Avg_VitaminA_14 Prop_Avg_VitaminB12_14
 
 *Yogurt, fromage, dessert
-svy, subpop(intake24): mean Prop_Avg_Iodine_15 
+svy, subpop(intake24): mean Prop_Avg_Calciummg_15  Prop_Avg_Iodine_15 
 
 
 
@@ -556,160 +600,177 @@ svy, subpop(intake24): mean Prop_Avg_Iodine_15
 *********
 *********
 
+*Export values to be created in R
+
+svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef Prop_Avg_Day_Lamb Prop_Avg_Day_Pork Prop_Avg_Day_Poultry Prop_Avg_D
+> ay_Game, over(age_cat)
+
+svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_Cream Prop_Avg_Day_Butter, over(age_cat)
+
 *FIGURE 1
-graph bar (mean) Prop_Avg_Day_Beef Prop_Avg_Day_Lamb Prop_Avg_Day_Pork Prop_Avg_Day_Poultry Prop_Avg_Day_Game [aweight=SHeS_Intake24_wt_sc], over(age_cat, relabel(1 "16-24y" 2 "25-34y" 3 "35-44y" 4 "45-54y" 5 "55-64y" 6 "65-74y" 7 "75y+") label(labsize(*1.2))) legend(size(*1.2) cols(3)) stack blabel(bar,pos(center) color(white) size(medium) format(%9.0f)) yvaroptions(relabel(1 "Beef" 2 "Lamb" 3 "Pork" 4 "Poultry" 5 "Game")) bar(1,color(18 67 109)) bar(2,color(40 161 151)) bar(3, color(128 22 80)) bar(4,color(244 106 37)) bar(5,color(61 61 61))  ylabel(, labsize(large)) ytitle("Percentage", size (medium)) 
+	*Animal type by age group
+	matrix avganimal = J(45, 2, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Day_Beef Prop_Avg_Day_Lamb Prop_Avg_Day_Pork Prop_Avg_Day_Poultry Prop_Avg_Day_Game {
+		
+			svy, subpop(intake24): mean `var', over(age_cat)
+			estat sd
+			matrix avganimal[`r'+5,2]=r(mean)[1,1]
+			matrix avganimal[`r'+10,2]=r(mean)[1,2]
+			matrix avganimal[`r'+15,2]=r(mean)[1,3]
+			matrix avganimal[`r'+20,2]=r(mean)[1,4]
+			matrix avganimal[`r'+25,2]=r(mean)[1,5]
+			matrix avganimal[`r'+30,2]=r(mean)[1,6]
+			matrix avganimal[`r'+35,2]=r(mean)[1,7]
+
+			local r=`r'+1
+}
+
+	*Dairy type by age group
+	matrix avgdairy = J(45, 2, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_Cream Prop_Avg_Day_Butter {
+		
+			svy, subpop(intake24): mean `var', over(age_cat)
+			estat sd
+			matrix avgdairy[`r'+5,2]=r(mean)[1,1]
+			matrix avgdairy[`r'+10,2]=r(mean)[1,2]
+			matrix avgdairy[`r'+15,2]=r(mean)[1,3]
+			matrix avgdairy[`r'+20,2]=r(mean)[1,4]
+			matrix avgdairy[`r'+25,2]=r(mean)[1,5]
+			matrix avgdairy[`r'+30,2]=r(mean)[1,6]
+			matrix avgdairy[`r'+35,2]=r(mean)[1,7]
+
+			local r=`r'+1
+}
+
 
 *FIGURE 2
-graph bar (mean) Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter [aweight=SHeS_Intake24_wt_sc], over(age_cat, relabel(1 "16-24" 2 "25-34" 3 "35-44" 4 "45-54" 5 "55-64" 6 "65-74" 7 "≥75") label(labsize(large))) legend(size(*1.2) cols(3)) stack blabel(bar,pos(center) color(white) size(vsmall) format(%9.0f)) yvaroptions(relabel(1 "Milk" 2 "Cheese" 3 "Yogurt" 4 "Cream & desserts" 5 "Butter")) bar(1,color(18 67 109)) bar(2,color(40 161 151)) bar(3, color(128 22 80)) bar(4,color(244 106 37)) bar(5,color(61 61 61)) ytitle("Grams/day", size (medium)) b1title("Age group (years)")
+	*Manufactured chicken
+	matrix avgchickenman = J(15, 2, .)
+	local r=2
 
+	foreach var of varlist Prop_Avg_Proteing_27A Prop_Avg_Fatg_27A Prop_Avg_Ironmg_27A Prop_Avg_Phosphorusmg_27A Prop_Avg_Selenium_27A Prop_Avg_Sodiummg_27A Prop_Avg_Zincmg_27A Prop_Avg_Riboflavinmg_27A Prop_Avg_Niacin_27A Prop_Avg_VitaminB6mg_27A Prop_Avg_VitaminB12_27A Prop_Avg_VitaminD_27A {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgchickenman[`r',2]=r(mean) 
+			
+			local r=`r'+1
 
-*Export values for Figures 3, 4 and 5 to be created in R
+}
+
+	*Other chicken
+	matrix avgchickenother = J(15, 2, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Proteing_27B Prop_Avg_Fatg_27B Prop_Avg_Ironmg_27B Prop_Avg_Phosphorusmg_27B Prop_Avg_Selenium_27B Prop_Avg_Sodiummg_27B Prop_Avg_Zincmg_27B Prop_Avg_Riboflavinmg_27B Prop_Avg_Niacin_27B Prop_Avg_VitaminB6mg_27B Prop_Avg_VitaminB12_27B Prop_Avg_VitaminD_27B {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgchickenother[`r',2]=r(mean) 
+			
+			local r=`r'+1
+
+}
+
+	*Manufactured beef
+	matrix avgbeefman = J(15, 2, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Proteing_23A Prop_Avg_Fatg_23A Prop_Avg_Ironmg_23A Prop_Avg_Phosphorusmg_23A Prop_Avg_Selenium_23A Prop_Avg_Sodiummg_23A Prop_Avg_Zincmg_23A Prop_Avg_Riboflavinmg_23A Prop_Avg_Niacin_23A Prop_Avg_VitaminB6mg_23A Prop_Avg_VitaminB12_23A Prop_Avg_VitaminD_23A {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgbeefman[`r',2]=r(mean) 
+			
+			local r=`r'+1
+
+	}
+
+	*Other beef
+	matrix avgbeefother = J(15, 2, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Proteing_23B Prop_Avg_Fatg_23B Prop_Avg_Ironmg_23B Prop_Avg_Phosphorusmg_23B Prop_Avg_Selenium_23B Prop_Avg_Sodiummg_23B Prop_Avg_Zincmg_23B Prop_Avg_Riboflavinmg_23B Prop_Avg_Niacin_23B Prop_Avg_VitaminB6mg_23B Prop_Avg_VitaminB12_23B Prop_Avg_VitaminD_23B {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgbeefother[`r',2]=r(mean) 
+			
+			local r=`r'+1
+
+	}
+
 
 *FIGURE 3
-matrix avgmeat = J(16, 2, .)
-local r=2
+	*Whole milk
+	matrix avgwholemilk = J(11, 2, .)
+	local r=2
 
-foreach var of varlist Prop_Avg_Proteing_FC5 Prop_Avg_Fatg_FC5 Prop_Avg_Calciummg_FC5 Prop_Avg_Chloridemg_FC5 Prop_Avg_Iodine_FC5 Prop_Avg_Ironmg_FC5 Prop_Avg_Phosphorusmg_FC5 Prop_Avg_Selenium_FC5 Prop_Avg_Sodiummg_FC5 Prop_Avg_Zincmg_FC5 Prop_Avg_VitaminA_FC5 Prop_Avg_Riboflavinmg_FC5 Prop_Avg_Niacin_FC5 Prop_Avg_VitaminB6mg_FC5 Prop_Avg_VitaminB12_FC5 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgmeat[`r',2]=r(mean) 
+	foreach var of varlist Prop_Avg_Proteing_10 Prop_Avg_Fatg_10 Prop_Avg_Calciummg_10 Prop_Avg_Iodine_10 Prop_Avg_Phosphorusmg_10 Prop_Avg_Zincmg_10 Prop_Avg_VitaminA_10 Prop_Avg_Riboflavinmg_10 Prop_Avg_VitaminB6mg_10 Prop_Avg_VitaminB12_10 {
 		
-		local r=`r'+1
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgwholemilk[`r',2]=r(mean) 
+			
+			local r=`r'+1
+
+	}
+
+	*Semi skimmed milk
+	matrix avgsemimilk = J(11, 3, .)
+	local r=2
+
+	foreach var of varlist Prop_Avg_Proteing_11 Prop_Avg_Fatg_11  Prop_Avg_Calciummg_11 Prop_Avg_Iodine_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_Zincmg_11 Prop_Avg_VitaminA_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgsemimilk[`r',3]=r(mean) 
+			
+			local r=`r'+1
+
+	}
+
+	*Other milk
+	matrix avgothermilk = J(11, 4, .)
+	local r=2
+
+	foreach var of varlist  Prop_Avg_Proteing_13 Prop_Avg_Fatg_13 Prop_Avg_Calciummg_13 Prop_Avg_Iodine_13 Prop_Avg_Phosphorusmg_13 Prop_Avg_Zincmg_13 Prop_Avg_VitaminA_13 Prop_Avg_Riboflavinmg_13 Prop_Avg_VitaminB6mg_13 Prop_Avg_VitaminB12_13 {
+		
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgothermilk[`r',4]=r(mean) 
+			
+			local r=`r'+1
 
 }
 
-matrix avgmilk = J(16, 2, .)
-local r=2
+	*Cheese
+	matrix avgcheese = J(11, 5, .)
+	local r=2
 
-foreach var of varlist Prop_Avg_Proteing_FC2 Prop_Avg_Fatg_FC2 Prop_Avg_Calciummg_FC2 Prop_Avg_Chloridemg_FC2 Prop_Avg_Iodine_FC2 Prop_Avg_Ironmg_FC2 Prop_Avg_Phosphorusmg_FC2 Prop_Avg_Selenium_FC2 Prop_Avg_Sodiummg_FC2 Prop_Avg_Zincmg_FC2 Prop_Avg_VitaminA_FC2 Prop_Avg_Riboflavinmg_FC2 Prop_Avg_Niacin_FC2 Prop_Avg_VitaminB6mg_FC2 Prop_Avg_VitaminB12_FC2 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgmilk[`r',2]=r(mean) 
+	foreach var of varlist Prop_Avg_Proteing_14 Prop_Avg_Fatg_14 Prop_Avg_Calciummg_14 Prop_Avg_Iodine_14 Prop_Avg_Phosphorusmg_14 Prop_Avg_Zincmg_14 Prop_Avg_VitaminA_14 Prop_Avg_Riboflavinmg_14 Prop_Avg_VitaminB6mg_14 Prop_Avg_VitaminB12_14 {
 		
-		local r=`r'+1
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgcheese[`r',5]=r(mean) 
+			
+			local r=`r'+1
 
 }
 
-*FIGURE 4
-*Manufactured chicken
-matrix avgchickenman = J(8, 2, .)
-local r=2
+	*Yogurt, fromage frais and dairy desserts
+	matrix avgyogurt = J(11, 6, .)
+	local r=2
 
-foreach var of varlist Prop_Avg_Proteing_27A Prop_Avg_Phosphorusmg_27A Prop_Avg_Selenium_27A Prop_Avg_Zincmg_27A Prop_Avg_Niacin_27A Prop_Avg_VitaminB6mg_27A Prop_Avg_VitaminB12_27A{
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgchickenman[`r',2]=r(mean) 
+	foreach var of varlist Prop_Avg_Proteing_15 Prop_Avg_Fatg_15 Prop_Avg_Calciummg_15 Prop_Avg_Iodine_15 Prop_Avg_Phosphorusmg_15 Prop_Avg_Zincmg_15 Prop_Avg_VitaminA_15 Prop_Avg_Riboflavinmg_15 Prop_Avg_VitaminB6mg_15 Prop_Avg_VitaminB12_15 {
 		
-		local r=`r'+1
-
+			svy, subpop(intake24): mean `var'
+			estat sd
+			matrix avgyogurt[`r',6]=r(mean) 
+			
+			local r=`r'+1
 }
-*Other chicken
-matrix avgchickenother = J(8, 2, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Proteing_27B Prop_Avg_Phosphorusmg_27B Prop_Avg_Selenium_27B Prop_Avg_Zincmg_27B Prop_Avg_Niacin_27B Prop_Avg_VitaminB6mg_27B Prop_Avg_VitaminB12_27B{
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgchickenother[`r',2]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Manufactured beef
-matrix avgbeefman = J(8, 2, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Proteing_23A Prop_Avg_Phosphorusmg_23A Prop_Avg_Selenium_23A Prop_Avg_Zincmg_23A Prop_Avg_Niacin_23A Prop_Avg_VitaminB6mg_23A Prop_Avg_VitaminB12_23A{
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgbeefman[`r',2]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Other beef
-matrix avgbeefother = J(8, 2, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Proteing_23B Prop_Avg_Phosphorusmg_23B Prop_Avg_Selenium_23B Prop_Avg_Zincmg_23B Prop_Avg_Niacin_23B Prop_Avg_VitaminB6mg_23B Prop_Avg_VitaminB12_23B{
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgbeefother[`r',2]=r(mean) 
-		
-		local r=`r'+1
-
-}
-
-*FIGURE 5
-*Whole milk
-matrix avgwholemilk = J(9, 2, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Calciummg_10 Prop_Avg_Iodine_10 Prop_Avg_Phosphorusmg_10 Prop_Avg_VitaminA_10 Prop_Avg_Riboflavinmg_10 Prop_Avg_VitaminB6mg_10 Prop_Avg_VitaminB12_10 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgwholemilk[`r',2]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Semi skimmed milk
-matrix avgsemimilk = J(9, 3, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Calciummg_11 Prop_Avg_Iodine_11 Prop_Avg_Phosphorusmg_11 Prop_Avg_VitaminA_11 Prop_Avg_Riboflavinmg_11 Prop_Avg_VitaminB6mg_11 Prop_Avg_VitaminB12_11 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgsemimilk[`r',3]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Other milk
-matrix avgothermilk = J(9, 4, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Calciummg_13 Prop_Avg_Iodine_13 Prop_Avg_Phosphorusmg_13 Prop_Avg_VitaminA_13 Prop_Avg_Riboflavinmg_13 Prop_Avg_VitaminB6mg_13 Prop_Avg_VitaminB12_13 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgothermilk[`r',4]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Cheese
-matrix avgcheese = J(9, 5, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Calciummg_14 Prop_Avg_Iodine_14 Prop_Avg_Phosphorusmg_14 Prop_Avg_VitaminA_14 Prop_Avg_Riboflavinmg_14 Prop_Avg_VitaminB6mg_14 Prop_Avg_VitaminB12_14 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgcheese[`r',5]=r(mean) 
-		
-		local r=`r'+1
-
-}
-*Yogurt, fromage frais and dairy desserts
-matrix avgyogurt = J(9, 6, .)
-local r=2
-
-foreach var of varlist Prop_Avg_Calciummg_15 Prop_Avg_Iodine_15 Prop_Avg_Phosphorusmg_15 Prop_Avg_VitaminA_15 Prop_Avg_Riboflavinmg_15 Prop_Avg_VitaminB6mg_15 Prop_Avg_VitaminB12_15 {
-	
-		svy, subpop(intake24): mean `var'
-		estat sd
-		matrix avgyogurt[`r',6]=r(mean) 
-		
-		local r=`r'+1
-
-}
-
