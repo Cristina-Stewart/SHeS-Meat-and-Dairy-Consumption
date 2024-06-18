@@ -602,8 +602,7 @@ svy, subpop(intake24): mean Prop_Avg_Calciummg_15  Prop_Avg_Iodine_15
 
 *Export values to be created in R
 
-svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef Prop_Avg_Day_Lamb Prop_Avg_Day_Pork Prop_Avg_Day_Poultry Prop_Avg_D
-> ay_Game, over(age_cat)
+svy, subpop(MeatConsumer): mean Prop_Avg_Day_Beef Prop_Avg_Day_Lamb Prop_Avg_Day_Pork Prop_Avg_Day_Poultry Prop_Avg_Day_Game, over(age_cat)
 
 svy, subpop(DairyConsumer): mean Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_Cream Prop_Avg_Day_Butter, over(age_cat)
 
