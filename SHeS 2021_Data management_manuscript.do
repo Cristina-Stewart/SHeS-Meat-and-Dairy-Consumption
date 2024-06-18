@@ -23,12 +23,12 @@ global location "K:\DrJaacksGroup\FSS - Dietary Monitoring\SHeS\SHeS 2021\Curren
 global data `"$location\Data"'
 global output `"$location\Output"'
 global code `"$location\Code"'
-global date "20231016"
+global date "20240603"
 
 *Demographic data
 global dems `"$data\shes21i_eul"'
 *Intake24 diet data (multiple obeservations per participant, each observation = food item reported)
-global diet `"$data\shes21_intake24_food-level_dietary_data_eul"'
+global diet `"$datadiet_dairydisag_20231512"'
 *Set maximum number of variables to 15,000
 set maxvar 15000
 
@@ -66,8 +66,10 @@ merge 1:m Cpseriala using "$diet"
 	*tab _merge InIntake24
 	drop _merge
 	*dropping nutrients not used
-	drop Retinol TotCarotene Alpcarotene Betacarotene BCryptoxanthin Alcoholg Waterg Totalsugarsg Othersugarsg Starchg Glucoseg Fructoseg Sucroseg Maltoseg Lactoseg Totalnitrogeng Cholesterolmg Saturatedfattyacidsg CisMonounsaturatedfattyacidsg Cisn6fattyacidsg Cisn3fattyacidsg Transfattyacidsg Fruitg DriedFruitg FruitJuiceg SmoothieFruitg Tomatoesg TomatoPureeg Brassicaceaeg YellowRedGreeng Beansg Nutsg OtherVegg Pantothenicacidmg Biotin VitaminD EnergykJ
-		*note: no DRV for pantothenic acid, biotin, or vitamin D
+	drop Retinol TotCarotene Alpcarotene Betacarotene BCryptoxanthin Alcoholg Waterg Totalsugarsg Othersugarsg Starchg Glucoseg Fructoseg Sucroseg Maltoseg Lactoseg Totalnitrogeng Cholesterolmg Saturatedfattyacidsg CisMonounsaturatedfattyacidsg Cisn6fattyacidsg Cisn3fattyacidsg Transfattyacidsg Fruitg DriedFruitg FruitJuiceg SmoothieFruitg Tomatoesg TomatoPureeg Brassicaceaeg YellowRedGreeng Beansg Nutsg OtherVegg Pantothenicacidmg Biotin
+		*note: no DRV for pantothenic acid, or biotin
+	*dropping old cheese disag variables not used
+	drop CottageCheeseg CheddarCheeseg OtherCheeseg
 
 ****************************************
 *Create subpop variable for analysis
@@ -385,6 +387,63 @@ foreach var of varlist totalbeef totallamb totalpork totalpoultry totalgame totm
 	replace `var' =. if RecallNo==. 
 }
 
+***DAIRY***
+
+*Day level
+bysort Cpseriala RecallNo: egen Day_Dairy=sum(Dairyg)
+bysort Cpseriala RecallNo: egen Day_Milk=sum(Milkg)
+bysort Cpseriala RecallNo: egen Day_Cheese=sum(Cheeseg)
+bysort Cpseriala RecallNo: egen Day_Yogurt=sum(Yogurtg)
+bysort Cpseriala RecallNo: egen Day_Cream=sum(Creamg)
+bysort Cpseriala RecallNo: egen Day_Butter=sum(Butterg)
+
+bysort Cpseriala RecallNo: egen Day_Milk_Skimmed=sum(Milk_Skimmedg)
+bysort Cpseriala RecallNo: egen Day_Milk_SemiSkimmed=sum(Milk_SemiSkimmedg)
+bysort Cpseriala RecallNo: egen Day_Milk_Whole=sum(Milk_Wholeg)
+
+bysort Cpseriala RecallNo: egen Day_Cheese_Cheddar=sum(Cheese_Cheddarg)
+bysort Cpseriala RecallNo: egen Day_Cheese_Cottage=sum(Cheese_Cottageg)
+bysort Cpseriala RecallNo: egen Day_Cheese_Other=sum(Cheese_Otherg)
+
+bysort Cpseriala RecallNo: egen Day_Cheese_Skimmed=sum(Cheese_Skimmedg)
+bysort Cpseriala RecallNo: egen Day_Cheese_SemiSkimmed=sum(Cheese_SemiSkimmedg)
+bysort Cpseriala RecallNo: egen Day_Cheese_Whole=sum(Cheese_Wholeg)
+
+bysort Cpseriala RecallNo: egen Day_Yogurt_Skimmed=sum(Yogurt_Skimmedg)
+bysort Cpseriala RecallNo: egen Day_Yogurt_SemiSkimmed=sum(Yogurt_SemiSkimmedg)
+bysort Cpseriala RecallNo: egen Day_Yogurt_Whole=sum(Yogurt_Wholeg)
+
+bysort Cpseriala RecallNo: egen Day_Cream_SemiSkimmed=sum(Cream_SemiSkimmedg)
+bysort Cpseriala RecallNo: egen Day_Cream_Whole=sum(Cream_Wholeg)
+
+
+*Calculate daily intakes of low vs regular fat dairy
+	*Total dairy
+	bysort Cpseriala RecallNo: gen Day_Dairy_LF= Day_Milk_Skimmed + Day_Milk_SemiSkimmed + Day_Cheese_Skimmed + Day_Cheese_SemiSkimmed + Day_Yogurt_Skimmed + Day_Yogurt_SemiSkimmed + Day_Cream_SemiSkimmed
+	bysort Cpseriala RecallNo: gen Day_Dairy_HF= Day_Milk_Whole + Day_Cheese_Whole + Day_Yogurt_Whole + Day_Cream_Whole + Day_Butter 
+
+	*Milk
+	bysort Cpseriala RecallNo: gen Day_Milk_LF= Day_Milk_Skimmed + Day_Milk_SemiSkimmed
+	bysort Cpseriala RecallNo: gen Day_Milk_HF= Day_Milk_Whole
+
+	*Cheese
+	bysort Cpseriala RecallNo: gen Day_Cheese_LF= Day_Cheese_Skimmed + Day_Cheese_SemiSkimmed
+	bysort Cpseriala RecallNo: gen Day_Cheese_HF= Day_Cheese_Whole
+	
+	*Yogurt
+	bysort Cpseriala RecallNo: gen Day_Yogurt_LF= Day_Yogurt_Skimmed + Day_Yogurt_SemiSkimmed
+	bysort Cpseriala RecallNo: gen Day_Yogurt_HF= Day_Yogurt_Whole
+	
+	*Cream
+	bysort Cpseriala RecallNo: gen Day_Cream_LF= Day_Cream_SemiSkimmed
+	bysort Cpseriala RecallNo: gen Day_Cream_HF= Day_Cream_Whole
+
+	
+*Replace values of those without recalls to missing
+foreach var of varlist Dairyg Milkg Milk_Skimmedg Milk_SemiSkimmedg Milk_Wholeg Cheeseg Cheese_Cheddarg Cheese_Cottageg Cheese_Otherg Cheese_Skimmedg Cheese_SemiSkimmedg Cheese_Wholeg Yogurtg Yogurt_Skimmedg Yogurt_SemiSkimmedg Yogurt_Wholeg Creamg Cream_SemiSkimmedg Cream_Wholeg Butterg Day_Dairy Day_Milk Day_Cheese Day_Yogurt Day_Cream Day_Butter Day_Milk_Skimmed Day_Milk_SemiSkimmed Day_Milk_Whole Day_Cheese_Cheddar Day_Cheese_Cottage Day_Cheese_Other Day_Cheese_Skimmed Day_Cheese_SemiSkimmed Day_Cheese_Whole Day_Yogurt_Skimmed Day_Yogurt_SemiSkimmed Day_Yogurt_Whole Day_Cream_SemiSkimmed Day_Cream_Whole {
+	replace `var' =. if RecallNo==. 
+}
+
 
 ***NUTRIENTS***
 
@@ -392,122 +451,10 @@ foreach var of varlist totalbeef totallamb totalpork totalpoultry totalgame totm
 rename Niacinequivalentmg Niacin /*Variable names get too long in the data loop so have to rename*/
 
 *Loop to calculate daily intake of each nutrient
-foreach var of varlist Energykcal Proteing Fatg Carbohydrateg Sodiummg Potassiummg Calciummg Magnesiummg Phosphorusmg Ironmg Coppermg Zincmg Chloridemg VitaminA VitaminEmg Thiaminmg Riboflavinmg Niacin VitaminB6mg VitaminB12 Folate VitaminCmg FreeSugarsg AOACFibreg Manganesemg Selenium Iodine {
+foreach var of varlist Energykcal EnergykJ Proteing Fatg Carbohydrateg Sodiummg Potassiummg Calciummg Magnesiummg Phosphorusmg Ironmg Coppermg Zincmg Chloridemg VitaminA VitaminD VitaminEmg Thiaminmg Riboflavinmg Niacin VitaminB6mg VitaminB12 Folate VitaminCmg FreeSugarsg AOACFibreg Manganesemg Selenium Iodine {
 	bysort Cpseriala RecallNo: egen Day_`var' =sum(`var') 
 	replace Day_`var' =. if RecallNo==. 
 }
-
-
-***DAIRY***
-
-/*Quark was categorised into fromage frais and other desserts but also disaggregated into 100% 'other cheese'. 
-Re-categorising quark into 'other cheese' so it will not be counted twice*/
-
-replace RecipeMainFoodGroupCode=14 if FoodDescription=="Quark"
-replace RecipeMainFoodGroupDesc="Cheese" if FoodDescription=="Quark"
-
-replace RecipeSubFoodGroupCode="14R" if FoodDescription=="Quark"
-replace RecipeSubFoodGroupDesc="Other Cheese" if FoodDescription=="Quark"
-
-*Food level
-egen totcheese=rowtotal(CottageCheeseg CheddarCheeseg OtherCheeseg)
-egen totmilk=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="10R" | RecipeSubFoodGroupCode=="11R" | RecipeSubFoodGroupCode=="60R" | RecipeSubFoodGroupCode=="12R" | RecipeSubFoodGroupCode=="13R")
-egen totyogurt=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="15B"
-egen totbutter=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="17R"
-egen totcreamdesserts=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="15C" | RecipeSubFoodGroupCode=="15D"| RecipeSubFoodGroupCode=="13B" | RecipeSubFoodGroupCode=="53R")
-egen totdairy=rowtotal(totcheese totmilk totyogurt totbutter totcreamdesserts)
-egen totmilkyog=rowtotal(totmilk totyogurt)
-
-/*Calculating total cheese and total dairy from individual items only (i.e. not incl composite dishes)
-Necessary to explore the proportion of low/high fat dairy items, as can only look at individual items*/
-
-*Total cheese and dairy from individual items
-egen totcheese_indiv=rowtotal(TotalGrams) if RecipeMainFoodGroupCode==14
-egen totdairy_indiv=rowtotal(totcheese_indiv totmilk totyogurt totbutter totcreamdesserts)
-
-*Day level
-bysort Cpseriala RecallNo: egen Day_TotDairy =sum(totdairy)
-bysort Cpseriala RecallNo: egen Day_TotMilkYog =sum(totmilkyog)
-bysort Cpseriala RecallNo: egen Day_Milk =sum(totmilk)
-bysort Cpseriala RecallNo: egen Day_Cheese =sum(totcheese)
-bysort Cpseriala RecallNo: egen Day_Yogurt =sum(totyogurt)
-bysort Cpseriala RecallNo: egen Day_CreamDesserts =sum(totcreamdesserts)
-bysort Cpseriala RecallNo: egen Day_Butter=sum(totbutter)
-bysort Cpseriala RecallNo: egen Day_TotDairy_Indiv =sum(totdairy_indiv)
-bysort Cpseriala RecallNo: egen Day_Cheese_Indiv =sum(totcheese_indiv)
-
-bysort Cpseriala RecallNo: egen Day_WholeMilk=sum(TotalGrams) if RecipeMainFoodGroupCode==10 
-replace Day_WholeMilk=0 if RecipeMainFoodGroupCode!=10 
-bysort Cpseriala RecallNo: egen Day_SemiMilk=sum(TotalGrams) if RecipeMainFoodGroupCode==11
-replace Day_SemiMilk=0 if RecipeMainFoodGroupCode!=11
-bysort Cpseriala RecallNo: egen Day_1Milk=sum(TotalGrams) if RecipeMainFoodGroupCode==60 
-replace Day_1Milk=0 if RecipeMainFoodGroupCode!=60
-bysort Cpseriala RecallNo: egen Day_SkimMilk=sum(TotalGrams) if RecipeMainFoodGroupCode==12
-replace Day_SkimMilk=0 if RecipeMainFoodGroupCode!=12
-bysort Cpseriala RecallNo: egen Day_OtherMilkCream=sum(TotalGrams) if RecipeMainFoodGroupCode==13
-replace Day_OtherMilkCream=0 if RecipeMainFoodGroupCode!=13
-bysort Cpseriala RecallNo: egen Day_YogFromDessert=sum(TotalGrams) if RecipeMainFoodGroupCode==15
-replace Day_YogFromDessert=0 if RecipeMainFoodGroupCode!=15
-bysort Cpseriala RecallNo: egen Day_IceCream=sum(TotalGrams) if RecipeMainFoodGroupCode==53
-replace Day_IceCream=0 if RecipeMainFoodGroupCode!=53
-
-*Replace values of those without recalls to missing
-foreach var of varlist totcheese totmilk totyogurt totbutter totcreamdesserts totdairy totmilkyog totcheese_indiv totdairy_indiv Day_TotDairy Day_TotMilkYog Day_Milk Day_Cheese Day_Yogurt Day_CreamDesserts Day_Butter Day_TotDairy_Indiv Day_Cheese_Indiv Day_WholeMilk Day_SemiMilk Day_1Milk Day_OtherMilkCream Day_YogFromDessert Day_IceCream{
-	replace `var' =. if RecallNo==. 
-}
-
-
-/**********************************************************************************
-*Categorise dairy items as high fat vs low fat and calculate daily intakes of both
-**********************************************************************************/
-
-***Create dummy variable for high fat dairy
-gen HighFat_Dairy=.
-replace HighFat_Dairy=1 if FoodCategoryCode==2
-
-replace HighFat_Dairy=0 if RecipeSubFoodGroupCode=="11R" | RecipeSubFoodGroupCode=="60R" | RecipeSubFoodGroupCode=="12R" | RecipeSubFoodGroupCode=="13B" & (strpos(FoodDescription, "reduced fat") | strpos(FoodDescription, "Single cream")) | RecipeSubFoodGroupCode=="13R" & (strpos(FoodDescription, "skimmed") | strpos(FoodDescription, "Light") | strpos(FoodDescription, "light")) | RecipeMainFoodGroupCode==14 & (strpos(FoodDescription, "low-fat") | strpos(FoodDescription, "reduced fat") | strpos(FoodDescription, "Reduced fat")) | RecipeMainFoodGroupCode==15 & (strpos(FoodDescription, "low fat") | strpos(FoodDescription, "fat free") | strpos(FoodDescription, "Low fat") | strpos(FoodDescription, "Light") | strpos(FoodDescription, "light")) |RecipeSubFoodGroupCode=="53R" & (strpos(FoodDescription, "reduced fat") | strpos(FoodDescription, "fat free") | strpos(FoodDescription, "light"))
-
-*Food level - high fat
-egen totcheese_indivHF=rowtotal(TotalGrams) if RecipeMainFoodGroupCode==14 & HighFat_Dairy==1
-egen totmilk_HF=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="10R" | RecipeSubFoodGroupCode=="11R" | RecipeSubFoodGroupCode=="60R" | RecipeSubFoodGroupCode=="12R" | RecipeSubFoodGroupCode=="13R") & HighFat_Dairy==1
-egen totyogurt_HF=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="15B" & HighFat_Dairy==1
-egen totbutter_HF=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="17R" & HighFat_Dairy==1
-egen totcreamdesserts_HF=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="15C" | RecipeSubFoodGroupCode=="15D"| RecipeSubFoodGroupCode=="13B" | RecipeSubFoodGroupCode=="53R")  & HighFat_Dairy==1
-egen totdairy_HF=rowtotal(totcheese_indivHF totmilk_HF totyogurt_HF totbutter_HF totcreamdesserts_HF) 
-egen totmilkandyogurt_HF=rowtotal(totmilk_HF totyogurt_HF)
-
-*Food level - low fat
-egen totcheese_indivLF=rowtotal(TotalGrams) if RecipeMainFoodGroupCode==14 & HighFat_Dairy==0
-egen totmilk_LF=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="10R" | RecipeSubFoodGroupCode=="11R" | RecipeSubFoodGroupCode=="60R" | RecipeSubFoodGroupCode=="12R" | RecipeSubFoodGroupCode=="13R") & HighFat_Dairy==0
-egen totyogurt_LF=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="15B" & HighFat_Dairy==0
-egen totbutter_LF=rowtotal(TotalGrams) if RecipeSubFoodGroupCode=="17R" & HighFat_Dairy==0
-egen totcreamdesserts_LF=rowtotal(TotalGrams) if (RecipeSubFoodGroupCode=="15C" | RecipeSubFoodGroupCode=="15D"| RecipeSubFoodGroupCode=="13B" | RecipeSubFoodGroupCode=="53R") & HighFat_Dairy==0
-egen totdairy_LF=rowtotal(totcheese_indivLF totmilk_LF totyogurt_LF totbutter_LF totcreamdesserts_LF) 
-egen totmilkandyogurt_LF=rowtotal(totmilk_LF totyogurt_LF)
-
-*Day level - high fat
-bysort Cpseriala RecallNo: egen Day_HFTotDairy =sum(totdairy_HF)
-bysort Cpseriala RecallNo: egen Day_HFTotMilkYog =sum(totmilkandyogurt_HF)
-bysort Cpseriala RecallNo: egen Day_HFMilk =sum(totmilk_HF)
-bysort Cpseriala RecallNo: egen Day_HFCheese =sum(totcheese_indivHF)
-bysort Cpseriala RecallNo: egen Day_HFYogurt =sum(totyogurt_HF)
-bysort Cpseriala RecallNo: egen Day_HFCreamDesserts =sum(totcreamdesserts_HF)
-bysort Cpseriala RecallNo: egen Day_HFButter=sum(totbutter_HF)
-
-*Day level - low fat
-bysort Cpseriala RecallNo: egen Day_LFTotDairy =sum(totdairy_LF)
-bysort Cpseriala RecallNo: egen Day_LFTotMilkYog =sum(totmilkandyogurt_LF)
-bysort Cpseriala RecallNo: egen Day_LFMilk =sum(totmilk_LF)
-bysort Cpseriala RecallNo: egen Day_LFCheese =sum(totcheese_indivLF)
-bysort Cpseriala RecallNo: egen Day_LFYogurt =sum(totyogurt_LF)
-bysort Cpseriala RecallNo: egen Day_LFCreamDesserts =sum(totcreamdesserts_LF)
-bysort Cpseriala RecallNo: egen Day_LFButter=sum(totbutter_LF)
-
-*Replace values of those without recalls to missing
-foreach var of varlist HighFat_Dairy totcheese_indivHF totmilk_HF totyogurt_HF totbutter_HF totcreamdesserts_HF totdairy_HF totmilkandyogurt_HF totcheese_indivLF totmilk_LF totyogurt_LF totbutter_LF totcreamdesserts_LF totdairy_LF totmilkandyogurt_LF Day_HFTotDairy Day_HFTotMilkYog Day_HFMilk Day_HFCheese Day_HFYogurt Day_HFCreamDesserts Day_HFButter Day_LFTotDairy Day_LFTotMilkYog Day_LFMilk Day_LFCheese Day_LFYogurt Day_LFCreamDesserts Day_LFButter{
-	replace `var' =. if RecallNo==. 
-}
-
 
 /**********************************************************
  Calculate mean daily intakes of meat, dairy and nutrients
@@ -554,7 +501,7 @@ replace WhiteMeatConsumer=1 if Avg_Day_WhiteMeat>0 & Avg_Day_WhiteMeat!=.
 
 *Dairy
 gen DairyConsumer=0
-replace DairyConsumer=1 if Avg_Day_TotDairy>0 & Avg_Day_TotDairy!=.
+replace DairyConsumer=1 if Avg_Day_Dairy>0 & Avg_Day_Dairy!=.
 
 
 **2) Consumer on day 1 and day 2 separately
@@ -576,12 +523,12 @@ drop MeatConsumer_Day1 MeatConsumer_Day2
 
 *Dairy 
 gen DairyConsumer_Day1=.
-replace DairyConsumer_Day1=1 if RecallNo==1 & Day_TotDairy>0 & Day_TotDairy!=.
-replace DairyConsumer_Day1=0 if RecallNo==1 & Day_TotDairy==0
+replace DairyConsumer_Day1=1 if RecallNo==1 & Day_Dairy>0 & Day_Dairy!=.
+replace DairyConsumer_Day1=0 if RecallNo==1 & Day_Dairy==0
 
 gen DairyConsumer_Day2=.
-replace DairyConsumer_Day2=1 if RecallNo==2 & Day_TotDairy>0 & Day_TotDairy!=.
-replace DairyConsumer_Day2=0 if RecallNo==2 & Day_TotDairy==0
+replace DairyConsumer_Day2=1 if RecallNo==2 & Day_Dairy>0 & Day_Dairy!=.
+replace DairyConsumer_Day2=0 if RecallNo==2 & Day_Dairy==0
 
 bysort Cpseriala: egen DairyConsumerDay1 = max(DairyConsumer_Day1)
 bysort Cpseriala: egen DairyConsumerDay2 = max(DairyConsumer_Day2)
@@ -601,7 +548,7 @@ replace DairyConsumerDays = DairyConsumerDay1 if NumberOfRecalls==1
 /*********************************************************************
 Calculate mean daily nutrient intakes from HIGH LEVEL FOOD CATEGORIES
 *********************************************************************/
-local nutrients "totmeatg Energykcal Proteing Fatg Carbohydrateg Sodiummg Potassiummg Calciummg Magnesiummg Phosphorusmg Ironmg Coppermg Zincmg Chloridemg VitaminA VitaminEmg Thiaminmg Riboflavinmg Niacin VitaminB6mg VitaminB12 Folate VitaminCmg FreeSugarsg AOACFibreg Manganesemg Selenium Iodine" 
+local nutrients "totmeatg Dairyg Energykcal EnergykJ Proteing Fatg Carbohydrateg Sodiummg Potassiummg Calciummg Magnesiummg Phosphorusmg Ironmg Coppermg Zincmg Chloridemg VitaminA VitaminD VitaminEmg Thiaminmg Riboflavinmg Niacin VitaminB6mg VitaminB12 Folate VitaminCmg FreeSugarsg AOACFibreg Manganesemg Selenium Iodine" 
 levelsof FoodCategoryCode, local(FoodCategoryCode) 
 
 foreach var of varlist `nutrients' {
@@ -624,9 +571,9 @@ Only those nutrients carried forward in subsequent code
 
 	
 /*MEAT PRODUCTS
-local nutrients "Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Carbohydrateg Avg_Day_Sodiummg Avg_Day_Potassiummg Avg_Day_Calciummg Avg_Day_Magnesiummg Avg_Day_Phosphorusmg Avg_Day_Ironmg Avg_Day_Coppermg Avg_Day_Chloridemg Avg_Day_Zincmg  Avg_Day_VitaminA Avg_Day_VitaminEmg Avg_Day_Thiaminmg Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 Avg_Day_Folate Avg_Day_VitaminCmg Avg_Day_FreeSugarsg Avg_Day_AOACFibreg Avg_Day_Manganesemg Avg_Day_Selenium Avg_Day_Iodine"
+local nutrients "Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Carbohydrateg Avg_Day_Sodiummg Avg_Day_Potassiummg Avg_Day_Calciummg Avg_Day_Magnesiummg Avg_Day_Phosphorusmg Avg_Day_Ironmg Avg_Day_Coppermg Avg_Day_Chloridemg Avg_Day_Zincmg  Avg_Day_VitaminA Avg_Day_VitaminD Avg_Day_VitaminEmg Avg_Day_Thiaminmg Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 Avg_Day_Folate Avg_Day_VitaminCmg Avg_Day_FreeSugarsg Avg_Day_AOACFibreg Avg_Day_Manganesemg Avg_Day_Selenium Avg_Day_Iodine"
 
-local nutrmeat "Avg_Energykcal_FC5 Avg_Proteing_FC5 Avg_Fatg_FC5 Avg_Carbohydrateg_FC5 Avg_Sodiummg_FC5 Avg_Potassiummg_FC5 Avg_Calciummg_FC5 Avg_Magnesiummg_FC5 Avg_Phosphorusmg_FC5 Avg_Ironmg_FC5 Avg_Coppermg_FC5 Avg_Chloridemg_FC5 Avg_Zincmg_FC5  Avg_VitaminA_FC5 Avg_VitaminEmg_FC5 Avg_Thiaminmg_FC5 Avg_Riboflavinmg_FC5 Avg_Niacin_FC5 Avg_VitaminB6mg_FC5 Avg_VitaminB12_FC5 Avg_Folate_FC5 Avg_VitaminCmg_FC5 Avg_FreeSugarsg_FC5 Avg_AOACFibreg_FC5 Avg_Manganesemg_FC5 Avg_Selenium_FC5 Avg_Iodine_FC5"
+local nutrmeat "Avg_Energykcal_FC5 Avg_Proteing_FC5 Avg_Fatg_FC5 Avg_Carbohydrateg_FC5 Avg_Sodiummg_FC5 Avg_Potassiummg_FC5 Avg_Calciummg_FC5 Avg_Magnesiummg_FC5 Avg_Phosphorusmg_FC5 Avg_Ironmg_FC5 Avg_Coppermg_FC5 Avg_Chloridemg_FC5 Avg_Zincmg_FC5  Avg_VitaminA_FC5 Avg_VitaminD_FC5 Avg_VitaminEmg_FC5 Avg_Thiaminmg_FC5 Avg_Riboflavinmg_FC5 Avg_Niacin_FC5 Avg_VitaminB6mg_FC5 Avg_VitaminB12_FC5 Avg_Folate_FC5 Avg_VitaminCmg_FC5 Avg_FreeSugarsg_FC5 Avg_AOACFibreg_FC5 Avg_Manganesemg_FC5 Avg_Selenium_FC5 Avg_Iodine_FC5"
 
 local n : word count `nutrients'
 forvalues i = 1/`n' {
@@ -644,7 +591,7 @@ svyset [pweight=SHeS_Intake24_wt_sc], psu(psu) strata(Strata)
 	matrix nutrmeat = J(27, 3, .) 	
 	local r=1
 
-quietly foreach var of varlist Prop_Avg_Energykcal_FC5 Prop_Avg_Proteing_FC5 Prop_Avg_Fatg_FC5 Prop_Avg_Carbohydrateg_FC5 Prop_Avg_FreeSugarsg_FC5 Prop_Avg_AOACFibreg_FC5 Prop_Avg_Calciummg_FC5 Prop_Avg_Chloridemg_FC5 Prop_Avg_Coppermg_FC5 Prop_Avg_Iodine_FC5 Prop_Avg_Ironmg_FC5  Prop_Avg_Magnesiummg_FC5 Prop_Avg_Manganesemg_FC5 Prop_Avg_Phosphorusmg_FC5 Prop_Avg_Potassiummg_FC5 Prop_Avg_Selenium_FC5 Prop_Avg_Sodiummg_FC5 Prop_Avg_Zincmg_FC5 Prop_Avg_VitaminA_FC5 Prop_Avg_Thiaminmg_FC5 Prop_Avg_Riboflavinmg_FC5 Prop_Avg_Niacin_FC5 Prop_Avg_VitaminB6mg_FC5 Prop_Avg_Folate_FC5 Prop_Avg_VitaminB12_FC5 Prop_Avg_VitaminCmg_FC5 Prop_Avg_VitaminEmg_FC5 {
+quietly foreach var of varlist Prop_Avg_Energykcal_FC5 Prop_Avg_Proteing_FC5 Prop_Avg_Fatg_FC5 Prop_Avg_Carbohydrateg_FC5 Prop_Avg_FreeSugarsg_FC5 Prop_Avg_AOACFibreg_FC5 Prop_Avg_Calciummg_FC5 Prop_Avg_Chloridemg_FC5 Prop_Avg_Coppermg_FC5 Prop_Avg_Iodine_FC5 Prop_Avg_Ironmg_FC5  Prop_Avg_Magnesiummg_FC5 Prop_Avg_Manganesemg_FC5 Prop_Avg_Phosphorusmg_FC5 Prop_Avg_Potassiummg_FC5 Prop_Avg_Selenium_FC5 Prop_Avg_Sodiummg_FC5 Prop_Avg_Zincmg_FC5 Prop_Avg_VitaminA_FC5 Prop_Avg_VitaminD_FC5 Prop_Avg_Thiaminmg_FC5 Prop_Avg_Riboflavinmg_FC5 Prop_Avg_Niacin_FC5 Prop_Avg_VitaminB6mg_FC5 Prop_Avg_Folate_FC5 Prop_Avg_VitaminB12_FC5 Prop_Avg_VitaminCmg_FC5 Prop_Avg_VitaminEmg_FC5 {
 			
 		*overall
 		sum `var'
@@ -660,9 +607,9 @@ restore
 matrix list nutrmeat
 
 *MILK PRODUCTS
-local nutrients "Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Carbohydrateg Avg_Day_Sodiummg Avg_Day_Potassiummg Avg_Day_Calciummg Avg_Day_Magnesiummg Avg_Day_Phosphorusmg Avg_Day_Ironmg Avg_Day_Coppermg Avg_Day_Chloridemg Avg_Day_Zincmg  Avg_Day_VitaminA Avg_Day_VitaminEmg Avg_Day_Thiaminmg Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 Avg_Day_Folate Avg_Day_VitaminCmg Avg_Day_FreeSugarsg Avg_Day_AOACFibreg Avg_Day_Manganesemg Avg_Day_Selenium Avg_Day_Iodine"
+local nutrients "Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Carbohydrateg Avg_Day_Sodiummg Avg_Day_Potassiummg Avg_Day_Calciummg Avg_Day_Magnesiummg Avg_Day_Phosphorusmg Avg_Day_Ironmg Avg_Day_Coppermg Avg_Day_Chloridemg Avg_Day_Zincmg  Avg_Day_VitaminA Avg_Day_VitaminD Avg_Day_VitaminEmg Avg_Day_Thiaminmg Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 Avg_Day_Folate Avg_Day_VitaminCmg Avg_Day_FreeSugarsg Avg_Day_AOACFibreg Avg_Day_Manganesemg Avg_Day_Selenium Avg_Day_Iodine"
 
-local nutrmilk "Avg_Energykcal_FC2 Avg_Proteing_FC2 Avg_Fatg_FC2 Avg_Carbohydrateg_FC2 Avg_Sodiummg_FC2 Avg_Potassiummg_FC2 Avg_Calciummg_FC2 Avg_Magnesiummg_FC2 Avg_Phosphorusmg_FC2 Avg_Ironmg_FC2 Avg_Coppermg_FC2 Avg_Chloridemg_FC2 Avg_Zincmg_FC2  Avg_VitaminA_FC2 Avg_VitaminEmg_FC2 Avg_Thiaminmg_FC2 Avg_Riboflavinmg_FC2 Avg_Niacin_FC2 Avg_VitaminB6mg_FC2 Avg_VitaminB12_FC2 Avg_Folate_FC2 Avg_VitaminCmg_FC2 Avg_FreeSugarsg_FC2 Avg_AOACFibreg_FC2 Avg_Manganesemg_FC2 Avg_Selenium_FC2 Avg_Iodine_FC2"
+local nutrmilk "Avg_Energykcal_FC2 Avg_Proteing_FC2 Avg_Fatg_FC2 Avg_Carbohydrateg_FC2 Avg_Sodiummg_FC2 Avg_Potassiummg_FC2 Avg_Calciummg_FC2 Avg_Magnesiummg_FC2 Avg_Phosphorusmg_FC2 Avg_Ironmg_FC2 Avg_Coppermg_FC2 Avg_Chloridemg_FC2 Avg_Zincmg_FC2  Avg_VitaminA_FC2 Avg_VitaminD_FC2 Avg_VitaminEmg_FC2 Avg_Thiaminmg_FC2 Avg_Riboflavinmg_FC2 Avg_Niacin_FC2 Avg_VitaminB6mg_FC2 Avg_VitaminB12_FC2 Avg_Folate_FC2 Avg_VitaminCmg_FC2 Avg_FreeSugarsg_FC2 Avg_AOACFibreg_FC2 Avg_Manganesemg_FC2 Avg_Selenium_FC2 Avg_Iodine_FC2"
 
 local n : word count `nutrients'
 forvalues i = 1/`n' {
@@ -678,7 +625,7 @@ svyset [pweight=SHeS_Intake24_wt_sc], psu(psu) strata(Strata)
 
 	matrix nutrmilk = J(27, 3, .) 	
 	local r=1
-quietly foreach var of varlist Prop_Avg_Energykcal_FC2 Prop_Avg_Proteing_FC2 Prop_Avg_Fatg_FC2 Prop_Avg_Carbohydrateg_FC2 Prop_Avg_FreeSugarsg_FC2 Prop_Avg_AOACFibreg_FC2 Prop_Avg_Calciummg_FC2 Prop_Avg_Chloridemg_FC2 Prop_Avg_Coppermg_FC2 Prop_Avg_Iodine_FC2 Prop_Avg_Ironmg_FC2  Prop_Avg_Magnesiummg_FC2 Prop_Avg_Manganesemg_FC2 Prop_Avg_Phosphorusmg_FC2 Prop_Avg_Potassiummg_FC2 Prop_Avg_Selenium_FC2 Prop_Avg_Sodiummg_FC2 Prop_Avg_Zincmg_FC2 Prop_Avg_VitaminA_FC2 Prop_Avg_Thiaminmg_FC2 Prop_Avg_Riboflavinmg_FC2 Prop_Avg_Niacin_FC2 Prop_Avg_VitaminB6mg_FC2 Prop_Avg_Folate_FC2 Prop_Avg_VitaminB12_FC2 Prop_Avg_VitaminCmg_FC2 Prop_Avg_VitaminEmg_FC2 {
+quietly foreach var of varlist Prop_Avg_Energykcal_FC2 Prop_Avg_Proteing_FC2 Prop_Avg_Fatg_FC2 Prop_Avg_Carbohydrateg_FC2 Prop_Avg_FreeSugarsg_FC2 Prop_Avg_AOACFibreg_FC2 Prop_Avg_Calciummg_FC2 Prop_Avg_Chloridemg_FC2 Prop_Avg_Coppermg_FC2 Prop_Avg_Iodine_FC2 Prop_Avg_Ironmg_FC2  Prop_Avg_Magnesiummg_FC2 Prop_Avg_Manganesemg_FC2 Prop_Avg_Phosphorusmg_FC2 Prop_Avg_Potassiummg_FC2 Prop_Avg_Selenium_FC2 Prop_Avg_Sodiummg_FC2 Prop_Avg_Zincmg_FC2 Prop_Avg_VitaminA_FC2 Prop_Avg_VitaminD_FC2 Prop_Avg_Thiaminmg_FC2 Prop_Avg_Riboflavinmg_FC2 Prop_Avg_Niacin_FC2 Prop_Avg_VitaminB6mg_FC2 Prop_Avg_Folate_FC2 Prop_Avg_VitaminB12_FC2 Prop_Avg_VitaminCmg_FC2 Prop_Avg_VitaminEmg_FC2 {
 			
 		*overall
 		sum `var'
@@ -700,7 +647,7 @@ drop Prop_Avg_*
 /*******************************************************************************
 Calculate mean daily nutrient intakes from COLLAPSED HIGH LEVEL FOOD CATEGORIES
 *******************************************************************************/
-local nutrients "totmeatg Energykcal Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
+local nutrients "totmeatg Energykcal EnergykJ Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA VitaminD Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
 levelsof NewFoodCategoryCode, local(NewFoodCategoryCode) 
 
 foreach var of varlist `nutrients' {
@@ -718,7 +665,7 @@ foreach var of varlist `nutrients' {
 /***********************************************************
 Calculate mean daily nutrient intakes from MAIN FOOD GROUPS
 ***********************************************************/
-local nutrients "totmeatg Energykcal Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
+local nutrients "totmeatg Dairyg Energykcal EnergykJ Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA VitaminD Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
 levelsof RecipeMainFoodGroupCode, local(MainFoodGroup) 
 
 foreach var of varlist `nutrients' {
@@ -736,7 +683,7 @@ foreach var of varlist `nutrients' {
 /***********************************************************
 Calculate mean daily nutrient intakes from SUB FOOD GROUPS
 ***********************************************************/
-local nutrients "totmeatg Energykcal Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
+local nutrients "totmeatg Dairyg Energykcal EnergykJ Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA VitaminD Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
 levelsof RecipeSubFoodGroupCode, local(SubFoodGroup)
 
 foreach var of varlist `nutrients' {
@@ -764,13 +711,23 @@ foreach var of varlist `dailyaverage' {
 }
 
 
+/********************************************************************
+Create variables for proportion of meat subtype to total meat intake
+********************************************************************/
+ds Avg_Day_RedMeat Avg_Day_WhiteMeat Avg_Day_ProcessedMeat
+local dailyaverage `r(varlist)'
+foreach var of varlist `dailyaverage' {
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_TotalMeat)*100
+}
+
+
 /*******************************************************************
 Create variables for proportion of dairy types to total dairy inake
 *******************************************************************/
-ds Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter
+ds Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_Cream Avg_Day_Butter
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_TotDairy)*100
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Dairy)*100
 }
 
 
@@ -778,53 +735,40 @@ foreach var of varlist `dailyaverage' {
 Create variables for proportion of dairy consumed that is low/high fat
 **********************************************************************/
 
-*Total (individual, non composite) dairy
-ds Avg_Day_LFTotDairy Avg_Day_HFTotDairy
-local dailyaverage `r(varlist)'
-foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_TotDairy_Indiv)*100
-}
 
-*Total milk and yogurt
-ds Avg_Day_LFTotMilkYog Avg_Day_HFTotMilkYog
+*Total dairy
+ds Avg_Day_Dairy_LF Avg_Day_Dairy_HF
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_TotMilkYog)*100
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Dairy)*100
 }
 
 *Milk
-ds Avg_Day_LFMilk Avg_Day_HFMilk
+ds Avg_Day_Milk_LF Avg_Day_Milk_HF
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
     bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Milk)*100
 }
 
+*Cheese
+ds Avg_Day_Cheese_LF Avg_Day_Cheese_HF
+local dailyaverage `r(varlist)'
+foreach var of varlist `dailyaverage' {
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Cheese)*100
+}
+
 *Yogurt
-ds Avg_Day_LFYogurt Avg_Day_HFYogurt
+ds Avg_Day_Yogurt_LF Avg_Day_Yogurt_HF
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
     bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Yogurt)*100
 }
 
-*Cheese
-ds Avg_Day_LFCheese Avg_Day_HFCheese
+*Cream
+ds Avg_Day_Cream_LF Avg_Day_Cream_HF
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Cheese_Indiv)*100
-}
-
-*Butter
-ds Avg_Day_LFButter Avg_Day_HFButter
-local dailyaverage `r(varlist)'
-foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Butter)*100
-}
-
-*Cream and dairy desserts
-ds Avg_Day_LFCreamDesserts Avg_Day_HFCreamDesserts
-local dailyaverage `r(varlist)'
-foreach var of varlist `dailyaverage' {
-    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_CreamDesserts)*100
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Cream)*100
 }
 
 
@@ -841,12 +785,27 @@ foreach var of varlist `dailyaverage' {
 	replace Prop_`var'=0 if Avg_Day_TotalMeat==0
 }
 
+**Dairy
+ds Avg_Dairyg_*
+local dailyaverage `r(varlist)'
+foreach var of varlist `dailyaverage' {
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Dairy)*100 if Avg_Day_Dairy>0
+	replace Prop_`var'=0 if Avg_Day_Dairy==0
+}
 **Energy
 ds Avg_Energykcal_*
 local dailyaverage `r(varlist)'
 foreach var of varlist `dailyaverage' {
     bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_Energykcal)*100 if Avg_Day_Energykcal>0
 	replace Prop_`var'=0 if Avg_Day_Energykcal==0
+}
+
+**Energy (KJ)
+ds Avg_EnergykJ_*
+local dailyaverage `r(varlist)'
+foreach var of varlist `dailyaverage' {
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_EnergykJ)*100 if Avg_Day_EnergykJ>0
+	replace Prop_`var'=0 if Avg_Day_EnergykJ==0
 }
 
 **Protein
@@ -922,6 +881,14 @@ foreach var of varlist `dailyaverage' {
 	replace Prop_`var'=0 if Avg_Day_VitaminA==0
 }
 
+**Vitamin D
+ds Avg_VitaminD_*
+local dailyaverage `r(varlist)'
+foreach var of varlist `dailyaverage' {
+    bysort Cpseriala: gen Prop_`var'=(`var'/Avg_Day_VitaminD)*100 if Avg_Day_VitaminD>0
+	replace Prop_`var'=0 if Avg_Day_VitaminD==0
+}
+
 **Riboflavin
 ds Avg_Riboflavinmg_*
 local dailyaverage `r(varlist)'
@@ -982,8 +949,7 @@ do "$code\SHeS 2021_Labels_manuscript.do"
 *********************************
 *Drop  varibles no longer needed
 *********************************
-drop n totalbeef totalgame totallamb totalpork totalpoultry totbutter totbutter_HF totbutter_LF totcheese totcheese_indiv totcheese_indivHF totcheese_indivLF totcreamdesserts totcreamdesserts_HF totcreamdesserts_LF totdairy totdairy_HF totdairy_LF totdairy_indiv totmeatg totmilk totmilk_HF totmilk_LF totmilkandyogurt_HF totmilkandyogurt_LF totmilkyog totyogurt totyogurt_HF totyogurt_LF whitemeatg processedmeatg redmeatg redprocessedmeatg Pork_Burgers Game_Sausages Beef_Sausages Beef_Process Beef_Offal Beef_Burgers HighFat_Dairy Poultry_Offal Pork_Sausages Pork_Process Pork_Offal Lamb_Offal Lamb_Burgers Poultry_Sausages
-
+drop n Dairy_Ingredients- Butter Beef_Process- redprocessedmeatg
 
 **************
 *Save Dataset
@@ -994,7 +960,7 @@ save "$data\SHeS 2021_foodlevel_manuscript_$date.dta", replace
 
 *Participant level dataset for analysis (drop duplicates and unecessary food level variables)
 duplicates drop Cpseriala, force
-drop SubDay- TotalGrams FoodCategoryCode FoodCategoryDesc
+drop FoodNumber- Butterg Day_Beef- Day_Iodine
 
 save "$data\SHeS 2021_participantlevel__manuscript_$date.dta", replace
 
