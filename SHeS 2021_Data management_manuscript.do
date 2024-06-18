@@ -28,7 +28,7 @@ global date "20240603"
 *Demographic data
 global dems `"$data\shes21i_eul"'
 *Intake24 diet data (multiple obeservations per participant, each observation = food item reported)
-global diet `"$datadiet_dairydisag_20231512"'
+global diet `"$data\diet_dairydisag_20231512"'
 *Set maximum number of variables to 15,000
 set maxvar 15000
 
@@ -647,7 +647,7 @@ drop Prop_Avg_*
 /*******************************************************************************
 Calculate mean daily nutrient intakes from COLLAPSED HIGH LEVEL FOOD CATEGORIES
 *******************************************************************************/
-local nutrients "totmeatg Energykcal EnergykJ Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA VitaminD Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
+local nutrients "totmeatg Dairyg Energykcal EnergykJ Proteing Fatg Sodiummg Calciummg Phosphorusmg Ironmg Zincmg Chloridemg VitaminA VitaminD Riboflavinmg Niacin VitaminB6mg VitaminB12 Iodine Selenium" 
 levelsof NewFoodCategoryCode, local(NewFoodCategoryCode) 
 
 foreach var of varlist `nutrients' {
