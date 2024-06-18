@@ -23,7 +23,7 @@ graph drop _all
 global location "K:\DrJaacksGroup\FSS - Dietary Monitoring\SHeS\SHeS 2021\Current intakes paper" 
 global data `"$location\Data"'
 global output `"$location\Output"'
-global date "20231016"
+global date "20240603"
 
 *Set maximum number of variables to 15,000
 set maxvar 15000
@@ -33,6 +33,7 @@ use "$data\SHeS 2021_participantlevel__manuscript_$date.dta", clear
 svyset [pweight=SHeS_Intake24_wt_sc], psu(psu) strata(Strata)
 
 
+
 /*===================================================================================
 AVERAGE DAILY INTAKE OF NUTRIENTS, per capita
 ====================================================================================*/
@@ -40,7 +41,7 @@ AVERAGE DAILY INTAKE OF NUTRIENTS, per capita
 matrix avgnutrient = J(400, 8, .)
 local r=2
 
-quietly foreach var of varlist Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Iodine Avg_Day_Calciummg Avg_Day_Chloridemg Avg_Day_Ironmg Avg_Day_Phosphorusmg Avg_Day_Selenium Avg_Day_Sodiummg Avg_Day_Zincmg Avg_Day_VitaminA Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 {
+quietly foreach var of varlist Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg Avg_Day_Iodine Avg_Day_Calciummg Avg_Day_Chloridemg Avg_Day_Ironmg Avg_Day_Phosphorusmg Avg_Day_Selenium Avg_Day_Sodiummg Avg_Day_Zincmg Avg_Day_VitaminA Avg_Day_Riboflavinmg Avg_Day_Niacin Avg_Day_VitaminB6mg Avg_Day_VitaminB12 Avg_Day_VitaminD{
 			
 		*overall
 		sum `var'
@@ -59,169 +60,169 @@ quietly foreach var of varlist Avg_Day_Energykcal Avg_Day_Proteing Avg_Day_Fatg 
 		*by sex
 		*female
 		sum `var' if Sex==2 
-		matrix avgnutrient[`r'+17,1]=r(N) 
+		matrix avgnutrient[`r'+18,1]=r(N) 
 
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if Sex==2, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+17,3]=r(r2) 
-		matrix avgnutrient[`r'+17,5]=r(r1) 
-		matrix avgnutrient[`r'+17,6]=r(r3) 
+		matrix avgnutrient[`r'+18,3]=r(r2) 
+		matrix avgnutrient[`r'+18,5]=r(r1) 
+		matrix avgnutrient[`r'+18,6]=r(r3) 
 	
 		*male
 		sum `var' if Sex==1 
-		matrix avgnutrient[`r'+34,1]=r(N)
+		matrix avgnutrient[`r'+36,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if Sex==1, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+34,3]=r(r2) 
-		matrix avgnutrient[`r'+34,5]=r(r1) 
-		matrix avgnutrient[`r'+34,6]=r(r3)
+		matrix avgnutrient[`r'+36,3]=r(r2) 
+		matrix avgnutrient[`r'+36,5]=r(r1) 
+		matrix avgnutrient[`r'+36,6]=r(r3)
  		
 		svy, subpop(intake24): mean `var', over(Sex)
 		estat sd
-		matrix avgnutrient[`r'+17,2]=r(mean)[1,2] 
-		matrix avgnutrient[`r'+17,4]=r(sd)[1,2]
+		matrix avgnutrient[`r'+18,2]=r(mean)[1,2] 
+		matrix avgnutrient[`r'+18,4]=r(sd)[1,2]
 		
-		matrix avgnutrient[`r'+34,2]=r(mean)[1,1] 
-		matrix avgnutrient[`r'+34,4]=r(sd)[1,1]
+		matrix avgnutrient[`r'+36,2]=r(mean)[1,1] 
+		matrix avgnutrient[`r'+36,4]=r(sd)[1,1]
 	
 		*by age
 		*16-24
 		sum `var' if age_cat==1 
-		matrix avgnutrient[`r'+51,1]=r(N) 
+		matrix avgnutrient[`r'+54,1]=r(N) 
 
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==1, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+51,3]=r(r2) 
-		matrix avgnutrient[`r'+51,5]=r(r1) 
-		matrix avgnutrient[`r'+51,6]=r(r3) 
+		matrix avgnutrient[`r'+54,3]=r(r2) 
+		matrix avgnutrient[`r'+54,5]=r(r1) 
+		matrix avgnutrient[`r'+54,6]=r(r3) 
 		
 		*25-34
 		sum `var' if age_cat==2
-		matrix avgnutrient[`r'+68,1]=r(N)
+		matrix avgnutrient[`r'+72,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==2, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+68,3]=r(r2) 
-		matrix avgnutrient[`r'+68,5]=r(r1) 
-		matrix avgnutrient[`r'+68,6]=r(r3)
+		matrix avgnutrient[`r'+72,3]=r(r2) 
+		matrix avgnutrient[`r'+72,5]=r(r1) 
+		matrix avgnutrient[`r'+72,6]=r(r3)
 		
  		*35-44
 		sum `var' if age_cat==3
-		matrix avgnutrient[`r'+85,1]=r(N)
+		matrix avgnutrient[`r'+90,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==3, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+85,3]=r(r2) 
-		matrix avgnutrient[`r'+85,5]=r(r1) 
-		matrix avgnutrient[`r'+85,6]=r(r3)	
+		matrix avgnutrient[`r'+90,3]=r(r2) 
+		matrix avgnutrient[`r'+90,5]=r(r1) 
+		matrix avgnutrient[`r'+90,6]=r(r3)	
 			
  		*45-54
 		sum `var' if age_cat==4
-		matrix avgnutrient[`r'+102,1]=r(N)
+		matrix avgnutrient[`r'+108,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==4, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+102,3]=r(r2) 
-		matrix avgnutrient[`r'+102,5]=r(r1) 
-		matrix avgnutrient[`r'+102,6]=r(r3)
+		matrix avgnutrient[`r'+108,3]=r(r2) 
+		matrix avgnutrient[`r'+108,5]=r(r1) 
+		matrix avgnutrient[`r'+108,6]=r(r3)
 			
  		*55-64
 		sum `var' if age_cat==5
-		matrix avgnutrient[`r'+119,1]=r(N)
+		matrix avgnutrient[`r'+126,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==5, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+119,3]=r(r2) 
-		matrix avgnutrient[`r'+119,5]=r(r1) 
-		matrix avgnutrient[`r'+119,6]=r(r3)		
+		matrix avgnutrient[`r'+126,3]=r(r2) 
+		matrix avgnutrient[`r'+126,5]=r(r1) 
+		matrix avgnutrient[`r'+126,6]=r(r3)		
 				
  		*65-74
 		sum `var' if age_cat==6
-		matrix avgnutrient[`r'+136,1]=r(N)
+		matrix avgnutrient[`r'+144,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==6, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+136,3]=r(r2) 
-		matrix avgnutrient[`r'+136,5]=r(r1) 
-		matrix avgnutrient[`r'+136,6]=r(r3)			
+		matrix avgnutrient[`r'+144,3]=r(r2) 
+		matrix avgnutrient[`r'+144,5]=r(r1) 
+		matrix avgnutrient[`r'+144,6]=r(r3)			
 					
  		*75+
 		sum `var' if age_cat==7
-		matrix avgnutrient[`r'+153,1]=r(N)
+		matrix avgnutrient[`r'+162,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if age_cat==7, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+153,3]=r(r2) 
-		matrix avgnutrient[`r'+153,5]=r(r1) 
-		matrix avgnutrient[`r'+153,6]=r(r3)	
+		matrix avgnutrient[`r'+162,3]=r(r2) 
+		matrix avgnutrient[`r'+162,5]=r(r1) 
+		matrix avgnutrient[`r'+162,6]=r(r3)	
 		
 		svy, subpop(intake24): mean `var', over(age_cat)
 		estat sd
-		matrix avgnutrient[`r'+51,2]=r(mean)[1,1] 
-		matrix avgnutrient[`r'+51,4]=r(sd)[1,1] 
-		matrix avgnutrient[`r'+68,2]=r(mean)[1,2] 
-		matrix avgnutrient[`r'+68,4]=r(sd)[1,2] 
-		matrix avgnutrient[`r'+85,2]=r(mean)[1,3] 
-		matrix avgnutrient[`r'+85,4]=r(sd)[1,3]	
-		matrix avgnutrient[`r'+102,2]=r(mean)[1,4] 
-		matrix avgnutrient[`r'+102,4]=r(sd)[1,4]	
-		matrix avgnutrient[`r'+119,2]=r(mean)[1,5] 
-		matrix avgnutrient[`r'+119,4]=r(sd)[1,5]	
-		matrix avgnutrient[`r'+136,2]=r(mean)[1,6] 
-		matrix avgnutrient[`r'+136,4]=r(sd)[1,6]	
-		matrix avgnutrient[`r'+153,2]=r(mean)[1,7] 
-		matrix avgnutrient[`r'+153,4]=r(sd)[1,7]
+		matrix avgnutrient[`r'+54,2]=r(mean)[1,1] 
+		matrix avgnutrient[`r'+54,4]=r(sd)[1,1] 
+		matrix avgnutrient[`r'+72,2]=r(mean)[1,2] 
+		matrix avgnutrient[`r'+72,4]=r(sd)[1,2] 
+		matrix avgnutrient[`r'+90,2]=r(mean)[1,3] 
+		matrix avgnutrient[`r'+90,4]=r(sd)[1,3]	
+		matrix avgnutrient[`r'+108,2]=r(mean)[1,4] 
+		matrix avgnutrient[`r'+108,4]=r(sd)[1,4]	
+		matrix avgnutrient[`r'+126,2]=r(mean)[1,5] 
+		matrix avgnutrient[`r'+126,4]=r(sd)[1,5]	
+		matrix avgnutrient[`r'+144,2]=r(mean)[1,6] 
+		matrix avgnutrient[`r'+144,4]=r(sd)[1,6]	
+		matrix avgnutrient[`r'+162,2]=r(mean)[1,7] 
+		matrix avgnutrient[`r'+162,4]=r(sd)[1,7]
 		
 		*By SIMD
 		*SIMD 1 (most deprived)
 		sum `var' if simd20_sga==1
-		matrix avgnutrient[`r'+170,1]=r(N)
+		matrix avgnutrient[`r'+180,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if simd20_sga==1, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+170,3]=r(r2) 
-		matrix avgnutrient[`r'+170,5]=r(r1) 
-		matrix avgnutrient[`r'+170,6]=r(r3)	
+		matrix avgnutrient[`r'+180,3]=r(r2) 
+		matrix avgnutrient[`r'+180,5]=r(r1) 
+		matrix avgnutrient[`r'+180,6]=r(r3)	
 
 		*SIMD 2
 		sum `var' if simd20_sga==2
-		matrix avgnutrient[`r'+187,1]=r(N)
+		matrix avgnutrient[`r'+198,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if simd20_sga==2, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+187,3]=r(r2) 
-		matrix avgnutrient[`r'+187,5]=r(r1) 
-		matrix avgnutrient[`r'+187,6]=r(r3)
+		matrix avgnutrient[`r'+198,3]=r(r2) 
+		matrix avgnutrient[`r'+198,5]=r(r1) 
+		matrix avgnutrient[`r'+198,6]=r(r3)
 		
 		*SIMD 3
 		sum `var' if simd20_sga==3
-		matrix avgnutrient[`r'+204,1]=r(N)
+		matrix avgnutrient[`r'+216,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if simd20_sga==3, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+204,3]=r(r2) 
-		matrix avgnutrient[`r'+204,5]=r(r1) 
-		matrix avgnutrient[`r'+204,6]=r(r3)
+		matrix avgnutrient[`r'+216,3]=r(r2) 
+		matrix avgnutrient[`r'+216,5]=r(r1) 
+		matrix avgnutrient[`r'+216,6]=r(r3)
 				
 		*SIMD 4
 		sum `var' if simd20_sga==4
-		matrix avgnutrient[`r'+221,1]=r(N)
+		matrix avgnutrient[`r'+234,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if simd20_sga==4, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+221,3]=r(r2) 
-		matrix avgnutrient[`r'+221,5]=r(r1) 
-		matrix avgnutrient[`r'+221,6]=r(r3)
+		matrix avgnutrient[`r'+234,3]=r(r2) 
+		matrix avgnutrient[`r'+234,5]=r(r1) 
+		matrix avgnutrient[`r'+234,6]=r(r3)
 
 		*SIMD 5 (least deprived)
 		sum `var' if simd20_sga==5
-		matrix avgnutrient[`r'+238,1]=r(N)
+		matrix avgnutrient[`r'+252,1]=r(N)
 		
 		_pctile `var' [pweight=SHeS_Intake24_wt_sc] if simd20_sga==5, p(2.5, 50, 97.5)
-		matrix avgnutrient[`r'+238,3]=r(r2) 
-		matrix avgnutrient[`r'+238,5]=r(r1) 
-		matrix avgnutrient[`r'+238,6]=r(r3)
+		matrix avgnutrient[`r'+252,3]=r(r2) 
+		matrix avgnutrient[`r'+252,5]=r(r1) 
+		matrix avgnutrient[`r'+252,6]=r(r3)
 		
 		svy, subpop(intake24): mean `var', over(simd20_sga)
 		estat sd
-		matrix avgnutrient[`r'+170,2]=r(mean)[1,1] 
-		matrix avgnutrient[`r'+170,4]=r(sd)[1,1] 
-		matrix avgnutrient[`r'+187,2]=r(mean)[1,2] 
-		matrix avgnutrient[`r'+187,4]=r(sd)[1,2] 
-		matrix avgnutrient[`r'+204,2]=r(mean)[1,3] 
-		matrix avgnutrient[`r'+204,4]=r(sd)[1,3]
-		matrix avgnutrient[`r'+221,2]=r(mean)[1,4] 
-		matrix avgnutrient[`r'+221,4]=r(sd)[1,4]
-		matrix avgnutrient[`r'+238,2]=r(mean)[1,5] 
-		matrix avgnutrient[`r'+238,4]=r(sd)[1,5]	
+		matrix avgnutrient[`r'+180,2]=r(mean)[1,1] 
+		matrix avgnutrient[`r'+180,4]=r(sd)[1,1] 
+		matrix avgnutrient[`r'+198,2]=r(mean)[1,2] 
+		matrix avgnutrient[`r'+198,4]=r(sd)[1,2] 
+		matrix avgnutrient[`r'+216,2]=r(mean)[1,3] 
+		matrix avgnutrient[`r'+216,4]=r(sd)[1,3]
+		matrix avgnutrient[`r'+234,2]=r(mean)[1,4] 
+		matrix avgnutrient[`r'+234,4]=r(sd)[1,4]
+		matrix avgnutrient[`r'+252,2]=r(mean)[1,5] 
+		matrix avgnutrient[`r'+252,4]=r(sd)[1,5]	
 				
 		local r=`r'+1
 }	
@@ -1416,6 +1417,113 @@ quietly foreach var of varlist Prop_Avg_VitaminA_FC1- Prop_Avg_VitaminA_FC18 {
 	putexcel C1="Mean"
 	putexcel D1="SD"
 	
+*VITAMIN A - Food category level
+matrix propnutrient = J(620, 4, .)
+local r=2
+
+quietly foreach var of varlist Prop_Avg_VitaminD_FC1- Prop_Avg_VitaminD_FC18 {
+			
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+19,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+38,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+19,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+19,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+38,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+38,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+57,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+76,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+95,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+114,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+133,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+152,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+171,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+57,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+57,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+76,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+76,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+95,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+95,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+114,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+114,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+133,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+133,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+152,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+152,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+171,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+171,3]=r(sd)[1,7]
+				
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+190,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+209,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+228,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+247,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+266,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+190,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+190,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+209,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+209,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+228,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+228,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+247,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+247,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+266,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+266,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+	*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("Vit D - food cat % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+
 	
 *RIBOFLAVIN - Food category level
 matrix propnutrient = J(620, 4, .)
@@ -1845,6 +1953,219 @@ quietly foreach var of varlist Prop_Avg_VitaminB12_FC1- Prop_Avg_VitaminB12_FC18
 	putexcel D1="SD"
 	
 
+	*VITAMIN B6- Food category level
+matrix propnutrient = J(620, 4, .)
+local r=2
+
+quietly foreach var of varlist Prop_Avg_VitaminB6mg_FC1- Prop_Avg_VitaminB6mg_FC18 {
+			
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+19,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+38,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+19,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+19,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+38,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+38,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+57,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+76,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+95,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+114,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+133,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+152,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+171,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+57,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+57,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+76,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+76,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+95,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+95,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+114,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+114,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+133,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+133,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+152,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+152,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+171,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+171,3]=r(sd)[1,7]
+				
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+190,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+209,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+228,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+247,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+266,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+190,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+190,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+209,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+209,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+228,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+228,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+247,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+247,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+266,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+266,3]=r(sd)[1,5]	
+				local r=`r'+1
+}	
+
+	*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("Vit B6 - food cat % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+	
+	
+*VITAMIN D - Food category level
+matrix propnutrient = J(620, 4, .)
+local r=2
+
+quietly foreach var of varlist Prop_Avg_VitaminD_FC1- Prop_Avg_VitaminD_FC18 {
+			
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+19,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+38,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+19,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+19,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+38,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+38,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+57,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+76,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+95,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+114,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+133,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+152,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+171,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+57,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+57,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+76,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+76,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+95,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+95,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+114,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+114,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+133,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+133,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+152,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+152,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+171,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+171,3]=r(sd)[1,7]
+				
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+190,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+209,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+228,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+247,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+266,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+190,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+190,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+209,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+209,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+228,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+228,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+247,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+247,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+266,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+266,3]=r(sd)[1,5]	
+				local r=`r'+1
+}	
+
+	*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("Vit D - food cat % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+	
 /*=================================================================
 AVERAGE % CONTRIBUTIONS TO NUTRIENT INTAKES @ MAIN FOOD GROUP LEVEL
 15 KEY NUTRIENTS
@@ -3034,6 +3355,113 @@ local r=2
 	putexcel C1="Mean"
 	putexcel D1="SD"
 
+*VITAMIN D - main food group level
+matrix propnutrient = J(2500, 4, .)
+local r=2
+
+	quietly foreach var of varlist Prop_Avg_VitaminD_1- Prop_Avg_VitaminD_66 {
+						
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+65,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+130,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+65,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+65,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+130,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+130,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+195,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+260,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+325,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+390,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+455,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+520,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+585,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+195,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+195,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+260,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+260,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+325,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+325,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+390,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+390,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+455,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+455,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+520,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+520,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+585,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+585,3]=r(sd)[1,7]
+				
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+650,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+715,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+780,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+845,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+910,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+650,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+650,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+715,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+715,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+780,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+780,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+845,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+845,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+910,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+910,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+	*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("VitaminD - MFG % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+
 *RIBOFLAVIN - main food group level
 matrix propnutrient = J(2500, 4, .)
 local r=2
@@ -3463,6 +3891,112 @@ local r=2
 	putexcel C1="Mean"
 	putexcel D1="SD"
 
+*VITAMIN D - main food group level
+	matrix propnutrient = J(2500, 4, .)
+	local r=2
+
+	quietly foreach var of varlist Prop_Avg_VitaminD_1- Prop_Avg_VitaminD_66 {
+						
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+65,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+130,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+65,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+65,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+130,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+130,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+195,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+260,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+325,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+390,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+455,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+520,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+585,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+195,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+195,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+260,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+260,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+325,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+325,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+390,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+390,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+455,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+455,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+520,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+520,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+585,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+585,3]=r(sd)[1,7]
+				
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+650,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+715,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+780,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+845,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+910,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+650,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+650,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+715,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+715,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+780,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+780,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+845,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+845,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+910,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+910,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+	*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("Vit D - MFG % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
 	
 /*================================================================
 AVERAGE % CONTRIBUTIONS TO NUTRIENT INTAKES @ SUB FOOD GROUP LEVEL
@@ -4674,7 +5208,7 @@ AVERAGE % CONTRIBUTIONS TO NUTRIENT INTAKES @ SUB FOOD GROUP LEVEL
 	putexcel B1="N" 
 	putexcel C1="Mean"
 	putexcel D1="SD"
-
+	
 **RIBOFLAVIN - sub food group
 	matrix propnutrient = J(5100, 4, .)
 	local r=2
@@ -5115,6 +5649,119 @@ AVERAGE % CONTRIBUTIONS TO NUTRIENT INTAKES @ SUB FOOD GROUP LEVEL
 
 	
 
+**VITAMIN D - sub food group
+	matrix propnutrient = J(5100, 4, .)
+	local r=2
+
+	quietly foreach var of varlist Prop_Avg_VitaminD_10R- Prop_Avg_VitaminD_9H {
+			
+		*overall		
+		sum `var'
+		matrix propnutrient[`r',1]=r(N)
+		
+		svy, subpop(intake24): mean `var'
+		estat sd
+		matrix propnutrient[`r',2]=r(mean)
+		matrix propnutrient[`r',3]=r(sd)		
+
+		*by sex
+		sum `var' if Sex==2 
+		matrix propnutrient[`r'+145,1]=r(N) 
+		
+		sum `var' if Sex==1 
+		matrix propnutrient[`r'+290,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(Sex)
+		estat sd
+		matrix propnutrient[`r'+145,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+145,3]=r(sd)[1,2]
+		matrix propnutrient[`r'+290,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+290,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 
+		matrix propnutrient[`r'+435,1]=r(N)
+		
+		sum `var' if age_cat==2 
+		matrix propnutrient[`r'+580,1]=r(N)
+		
+		sum `var' if age_cat==3 
+		matrix propnutrient[`r'+725,1]=r(N)
+		
+		sum `var' if age_cat==4 
+		matrix propnutrient[`r'+870,1]=r(N)
+		
+		sum `var' if age_cat==5
+		matrix propnutrient[`r'+1015,1]=r(N)
+		
+		sum `var' if age_cat==6 
+		matrix propnutrient[`r'+1160,1]=r(N)
+		
+		sum `var' if age_cat==7 
+		matrix propnutrient[`r'+1305,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(age_cat)
+		estat sd
+		matrix propnutrient[`r'+435,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+435,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+580,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+580,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+725,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+725,3]=r(sd)[1,3]	
+		matrix propnutrient[`r'+870,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+870,3]=r(sd)[1,4]	
+		matrix propnutrient[`r'+1015,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+1015,3]=r(sd)[1,5]	
+		matrix propnutrient[`r'+1160,2]=r(mean)[1,6] 
+		matrix propnutrient[`r'+1160,3]=r(sd)[1,6]	
+		matrix propnutrient[`r'+1305,2]=r(mean)[1,7] 
+		matrix propnutrient[`r'+1305,3]=r(sd)[1,7]
+		
+		
+		*By SIMD		
+		sum `var' if simd20_sga==1 
+		matrix propnutrient[`r'+1450,1]=r(N)
+		
+		sum `var' if simd20_sga==2 
+		matrix propnutrient[`r'+1595,1]=r(N)
+		
+		sum `var' if simd20_sga==3 
+		matrix propnutrient[`r'+1740,1]=r(N)
+		
+		sum `var' if simd20_sga==4 
+		matrix propnutrient[`r'+1885,1]=r(N)
+		
+		sum `var' if simd20_sga==5 
+		matrix propnutrient[`r'+2030,1]=r(N)
+		
+		svy, subpop(intake24): mean `var', over(simd20_sga)
+		estat sd
+		matrix propnutrient[`r'+1450,2]=r(mean)[1,1] 
+		matrix propnutrient[`r'+1450,3]=r(sd)[1,1] 
+		matrix propnutrient[`r'+1595,2]=r(mean)[1,2] 
+		matrix propnutrient[`r'+1595,3]=r(sd)[1,2] 
+		matrix propnutrient[`r'+1740,2]=r(mean)[1,3] 
+		matrix propnutrient[`r'+1740,3]=r(sd)[1,3]
+		matrix propnutrient[`r'+1885,2]=r(mean)[1,4] 
+		matrix propnutrient[`r'+1885,3]=r(sd)[1,4]
+		matrix propnutrient[`r'+2030,2]=r(mean)[1,5] 
+		matrix propnutrient[`r'+2030,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+
+*Export to Excel
+	putexcel set "$output\Nutrient Intakes_key nutrients.xlsx", sheet("Vitamin D - SFG % cont") modify
+	putexcel B2=matrix(propnutrient)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+
+
+	
+	
+	
 /*========================================
 AVERAGE DAILY INTAKES OF MEAT, per capita
 *Meat subtypes and animal types
@@ -5954,6 +6601,133 @@ AVERAGE % CONTRIBUTIONS TO MEAT INTAKE
 *Animal type and food groups 
 ======================================*/
 
+**Meat contributions - SUBTYPE (beef vs lamb vs pork vs game vs poultry)		
+	matrix avgmeat = J(200, 6, .) 	
+	local r=2
+
+	quietly foreach var of varlist Prop_Avg_Day_RedMeat Prop_Avg_Day_WhiteMeat Prop_Avg_Day_ProcessedMeat {
+			
+		*overall
+		sum `var'
+		matrix avgmeat[`r',1]=r(N)
+		
+		svy, subpop(MeatConsumer): mean `var'
+		estat sd
+		matrix avgmeat[`r',2]=r(mean) 
+		matrix avgmeat[`r',3]=r(sd) 
+				
+		*by sex
+		*female
+		sum `var' if Sex==2 & MeatConsumer==1
+		matrix avgmeat[`r'+5,1]=r(N) 
+
+		*male
+		sum `var' if Sex==1 & MeatConsumer==1
+		matrix avgmeat[`r'+10,1]=r(N)
+		 		
+		svy, subpop(MeatConsumer): mean `var', over(Sex)
+		estat sd
+		matrix avgmeat[`r'+5,2]=r(mean)[1,2]
+		matrix avgmeat[`r'+5,3]=r(sd)[1,2]
+		
+		matrix avgmeat[`r'+10,2]=r(mean)[1,1]
+		matrix avgmeat[`r'+10,3]=r(sd)[1,1]
+
+				
+		*by age
+		*16-24
+		sum `var' if age_cat==1 & MeatConsumer==1
+		matrix avgmeat[`r'+15,1]=r(N) 
+
+		*25-34
+		sum `var' if age_cat==2 & MeatConsumer==1
+		matrix avgmeat[`r'+20,1]=r(N)
+				
+ 		*35-44
+		sum `var' if age_cat==3 & MeatConsumer==1
+		matrix avgmeat[`r'+25,1]=r(N)
+			
+ 		*45-54
+		sum `var' if age_cat==4 & MeatConsumer==1
+		matrix avgmeat[`r'+30,1]=r(N)
+		
+ 		*55-64
+		sum `var' if age_cat==5 & MeatConsumer==1
+		matrix avgmeat[`r'+35,1]=r(N)
+		
+ 		*65-74
+		sum `var' if age_cat==6 & MeatConsumer==1
+		matrix avgmeat[`r'+40,1]=r(N)
+		
+ 		*75+
+		sum `var' if age_cat==7 & MeatConsumer==1
+		matrix avgmeat[`r'+45,1]=r(N)
+
+		svy, subpop(MeatConsumer): mean `var', over(age_cat)
+		estat sd
+		matrix avgmeat[`r'+15,2]=r(mean)[1,1] 
+		matrix avgmeat[`r'+15,3]=r(sd)[1,1] 
+		matrix avgmeat[`r'+20,2]=r(mean)[1,2] 
+		matrix avgmeat[`r'+20,3]=r(sd)[1,2] 
+		matrix avgmeat[`r'+25,2]=r(mean)[1,3] 
+		matrix avgmeat[`r'+25,3]=r(sd)[1,3]	
+		matrix avgmeat[`r'+30,2]=r(mean)[1,4] 
+		matrix avgmeat[`r'+30,3]=r(sd)[1,4]	
+		matrix avgmeat[`r'+35,2]=r(mean)[1,5] 
+		matrix avgmeat[`r'+35,3]=r(sd)[1,5]	
+		matrix avgmeat[`r'+40,2]=r(mean)[1,6] 
+		matrix avgmeat[`r'+40,3]=r(sd)[1,6]	
+		matrix avgmeat[`r'+45,2]=r(mean)[1,7] 
+		matrix avgmeat[`r'+45,3]=r(sd)[1,7]
+				
+		*By SIMD
+		*SIMD 1 (most deprived)
+		sum `var' if simd20_sga==1 & MeatConsumer==1
+		matrix avgmeat[`r'+50,1]=r(N)
+		
+		*SIMD 2
+		sum `var' if simd20_sga==2 & MeatConsumer==1
+		matrix avgmeat[`r'+55,1]=r(N)
+		
+		*SIMD 3
+		sum `var' if simd20_sga==3 & MeatConsumer==1
+		matrix avgmeat[`r'+60,1]=r(N)
+		
+		*SIMD 4
+		sum `var' if simd20_sga==4 & MeatConsumer==1
+		matrix avgmeat[`r'+65,1]=r(N)
+		
+		*SIMD 5 (least deprived)
+		sum `var' if simd20_sga==5 & MeatConsumer==1
+		matrix avgmeat[`r'+70,1]=r(N)
+				
+		svy, subpop(MeatConsumer): mean `var', over(simd20_sga)
+		estat sd
+		
+		matrix avgmeat[`r'+50,2]=r(mean)[1,1] 
+		matrix avgmeat[`r'+50,3]=r(sd)[1,1] 
+		matrix avgmeat[`r'+55,2]=r(mean)[1,2] 
+		matrix avgmeat[`r'+55,3]=r(sd)[1,2] 
+		matrix avgmeat[`r'+60,2]=r(mean)[1,3] 
+		matrix avgmeat[`r'+60,3]=r(sd)[1,3]
+		matrix avgmeat[`r'+65,2]=r(mean)[1,4] 
+		matrix avgmeat[`r'+65,3]=r(sd)[1,4]
+		matrix avgmeat[`r'+70,2]=r(mean)[1,5] 
+		matrix avgmeat[`r'+70,3]=r(sd)[1,5]	
+		
+		
+		local r=`r'+1
+}	
+
+
+* Export to Excel 
+	putexcel set "$output\SHeS Meat Intakes_Manuscript.xlsx", sheet("Subtype % cont") modify
+	putexcel B2=matrix(avgmeat)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD" 
+
+	
 **Meat contributions - ANIMAL TYPES (beef vs lamb vs pork vs game vs poultry)		
 	matrix avgmeat = J(200, 6, .) 	
 	local r=2
@@ -6080,118 +6854,6 @@ AVERAGE % CONTRIBUTIONS TO MEAT INTAKE
 	putexcel C1="Mean"
 	putexcel D1="SD" 
 	
-
-
-**Meat contributions - FOOD CATEGORIES
-	
-	matrix propmeatFC = J(620, 4, .)
-	local r=2
-
-quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
-			
-		*overall		
-		sum `var'
-		matrix propmeatFC[`r',1]=r(N)
-		
-		svy, subpop(MeatConsumer): mean `var'
-		estat sd
-		matrix propmeatFC[`r',2]=r(mean)
-		matrix propmeatFC[`r',3]=r(sd)
-
-		*by sex
-		sum `var' if Sex==2 & MeatConsumer==1
-		matrix propmeatFC[`r'+19,1]=r(N) 
-		
-		sum `var' if Sex==1  & MeatConsumer==1
-		matrix propmeatFC[`r'+38,1]=r(N)
-		
-		svy, subpop(MeatConsumer): mean `var', over(Sex)
-		estat sd
-		matrix propmeatFC[`r'+19,2]=r(mean)[1,2] 
-		matrix propmeatFC[`r'+19,3]=r(sd)[1,2]
-		matrix propmeatFC[`r'+38,2]=r(mean)[1,1] 
-		matrix propmeatFC[`r'+38,3]=r(sd)[1,1]
-		
-		*by age
-		sum `var' if age_cat==1  & MeatConsumer==1
-		matrix propmeatFC[`r'+57,1]=r(N)
-		
-		sum `var' if age_cat==2  & MeatConsumer==1
-		matrix propmeatFC[`r'+76,1]=r(N)
-		
-		sum `var' if age_cat==3  & MeatConsumer==1
-		matrix propmeatFC[`r'+95,1]=r(N)
-		
-		sum `var' if age_cat==4  & MeatConsumer==1
-		matrix propmeatFC[`r'+114,1]=r(N)
-		
-		sum `var' if age_cat==5 & MeatConsumer==1
-		matrix propmeatFC[`r'+133,1]=r(N)
-		
-		sum `var' if age_cat==6  & MeatConsumer==1
-		matrix propmeatFC[`r'+152,1]=r(N)
-		
-		sum `var' if age_cat==7  & MeatConsumer==1
-		matrix propmeatFC[`r'+171,1]=r(N)
-		
-		svy, subpop(MeatConsumer): mean `var', over(age_cat)
-		estat sd
-		matrix propmeatFC[`r'+57,2]=r(mean)[1,1] 
-		matrix propmeatFC[`r'+57,3]=r(sd)[1,1] 
-		matrix propmeatFC[`r'+76,2]=r(mean)[1,2] 
-		matrix propmeatFC[`r'+76,3]=r(sd)[1,2] 
-		matrix propmeatFC[`r'+95,2]=r(mean)[1,3] 
-		matrix propmeatFC[`r'+95,3]=r(sd)[1,3]	
-		matrix propmeatFC[`r'+114,2]=r(mean)[1,4] 
-		matrix propmeatFC[`r'+114,3]=r(sd)[1,4]	
-		matrix propmeatFC[`r'+133,2]=r(mean)[1,5] 
-		matrix propmeatFC[`r'+133,3]=r(sd)[1,5]	
-		matrix propmeatFC[`r'+152,2]=r(mean)[1,6] 
-		matrix propmeatFC[`r'+152,3]=r(sd)[1,6]	
-		matrix propmeatFC[`r'+171,2]=r(mean)[1,7] 
-		matrix propmeatFC[`r'+171,3]=r(sd)[1,7]
-		
-		
-		*By SIMD		
-		sum `var' if simd20_sga==1  & MeatConsumer==1
-		matrix propmeatFC[`r'+190,1]=r(N)
-		
-		sum `var' if simd20_sga==2  & MeatConsumer==1
-		matrix propmeatFC[`r'+209,1]=r(N)
-		
-		sum `var' if simd20_sga==3  & MeatConsumer==1
-		matrix propmeatFC[`r'+228,1]=r(N)
-		
-		sum `var' if simd20_sga==4  & MeatConsumer==1
-		matrix propmeatFC[`r'+247,1]=r(N)
-		
-		sum `var' if simd20_sga==5  & MeatConsumer==1
-		matrix propmeatFC[`r'+266,1]=r(N)
-		
-		svy, subpop(MeatConsumer): mean `var', over(simd20_sga)
-		estat sd
-		matrix propmeatFC[`r'+190,2]=r(mean)[1,1] 
-		matrix propmeatFC[`r'+190,3]=r(sd)[1,1] 
-		matrix propmeatFC[`r'+209,2]=r(mean)[1,2] 
-		matrix propmeatFC[`r'+209,3]=r(sd)[1,2] 
-		matrix propmeatFC[`r'+228,2]=r(mean)[1,3] 
-		matrix propmeatFC[`r'+228,3]=r(sd)[1,3]
-		matrix propmeatFC[`r'+247,2]=r(mean)[1,4] 
-		matrix propmeatFC[`r'+247,3]=r(sd)[1,4]
-		matrix propmeatFC[`r'+266,2]=r(mean)[1,5] 
-		matrix propmeatFC[`r'+266,3]=r(sd)[1,5]	
-		
-		local r=`r'+1
-}	
-
-
-*Export to Excel
-	putexcel set "$output\SHeS Meat Intakes_Manuscript.xlsx", sheet("Food category % cont") modify
-	putexcel B2=matrix(propmeatFC)
-	putexcel B1="N" 
-	putexcel C1="Mean"
-	putexcel D1="SD"
-
 	
 *Meat contributions - MAIN FOOD GROUP
 	matrix propmeatMFG = J(2500, 4, .)
@@ -6421,7 +7083,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 	quietly foreach var of varlist MeatConsumer RedMeatConsumer ProcessedMeatConsumer WhiteMeatConsumer  {
 			
 		*overall				
-		summ `var'
+		summ `var' if intake24==1
 		matrix meatconsumers[`r',1]=r(N) /*Per capita N*/
 		
 		summ `var' if `var'==1
@@ -6433,7 +7095,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		
 		*by sex
 		*female
-		sum `var' if Sex==2 
+		sum `var' if Sex==2 & intake24==1
 		matrix meatconsumers[`r'+5,1]=r(N) 
 		
 		summ `var' if Sex==2 & `var'==1
@@ -6443,7 +7105,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+5,3]=r(table)[1,2] 
 
 		*male
-		sum `var' if Sex==1 
+		sum `var' if Sex==1  & intake24==1
 		matrix meatconsumers[`r'+10,1]=r(N) 
 		
 		summ `var' if Sex==1 & `var'==1
@@ -6455,7 +7117,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 
 		*by age
 		*16-24
-		sum `var' if age_cat==1
+		sum `var' if age_cat==1 & intake24==1
 		matrix meatconsumers[`r'+15,1]=r(N) 
 		
 		summ `var' if age_cat==1 & `var'==1
@@ -6465,7 +7127,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+15,3]=r(table)[1,2] 
 	
 		*25-34
-		sum `var' if age_cat==2
+		sum `var' if age_cat==2 & intake24==1
 		matrix meatconsumers[`r'+20,1]=r(N) 
 		
 		summ `var' if age_cat==2 & `var'==1
@@ -6475,7 +7137,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+20,3]=r(table)[1,2] 
 		
  		*35-44
-		sum `var' if age_cat==3
+		sum `var' if age_cat==3 & intake24==1
 		matrix meatconsumers[`r'+25,1]=r(N) 
 		
 		summ `var' if age_cat==3 & `var'==1
@@ -6485,7 +7147,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+25,3]=r(table)[1,2] 
 			
  		*45-54
-		sum `var' if age_cat==4
+		sum `var' if age_cat==4 & intake24==1
 		matrix meatconsumers[`r'+30,1]=r(N) 
 		
 		summ `var' if age_cat==4 & `var'==1
@@ -6495,7 +7157,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+30,3]=r(table)[1,2] 
 		
  		*55-64
-		sum `var' if age_cat==5
+		sum `var' if age_cat==5 & intake24==1
 		matrix meatconsumers[`r'+35,1]=r(N) 
 		
 		summ `var' if age_cat==5 & `var'==1
@@ -6505,7 +7167,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+35,3]=r(table)[1,2] 
 				
  		*65-74
-		sum `var' if age_cat==6
+		sum `var' if age_cat==6 & intake24==1
 		matrix meatconsumers[`r'+40,1]=r(N) 
 		
 		summ `var' if age_cat==6 & `var'==1
@@ -6515,7 +7177,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+40,3]=r(table)[1,2] 
 					
  		*75+
-		sum `var' if age_cat==7
+		sum `var' if age_cat==7 & intake24==1
 		matrix meatconsumers[`r'+45,1]=r(N) 
 		
 		summ `var' if age_cat==7 & `var'==1
@@ -6527,7 +7189,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		
 		*By SIMD
 		*SIMD 1 (most deprived)
-		sum `var' if simd20_sga==1
+		sum `var' if simd20_sga==1 & intake24==1
 		matrix meatconsumers[`r'+50,1]=r(N) 
 		
 		summ `var' if simd20_sga==1 & `var'==1
@@ -6537,7 +7199,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+50,3]=r(table)[1,2] 
 
 		*SIMD 2
-		sum `var' if simd20_sga==2
+		sum `var' if simd20_sga==2 & intake24==1
 		matrix meatconsumers[`r'+55,1]=r(N) 
 		
 		summ `var' if simd20_sga==2 & `var'==1
@@ -6547,7 +7209,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+55,3]=r(table)[1,2] 
 		
 		*SIMD 3
-		sum `var' if simd20_sga==3
+		sum `var' if simd20_sga==3 & intake24==1
 		matrix meatconsumers[`r'+60,1]=r(N) 
 		
 		summ `var' if simd20_sga==3 & `var'==1
@@ -6557,7 +7219,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+60,3]=r(table)[1,2] 
 				
 		*SIMD 4
-		sum `var' if simd20_sga==4
+		sum `var' if simd20_sga==4 & intake24==1
 		matrix meatconsumers[`r'+65,1]=r(N) 
 		
 		summ `var' if simd20_sga==4 & `var'==1
@@ -6567,7 +7229,7 @@ quietly foreach var of varlist Prop_Avg_totmeatg_FC1- Prop_Avg_totmeatg_FC18 {
 		matrix meatconsumers[`r'+65,3]=r(table)[1,2] 
 
 		*SIMD 5 (least deprived)
-		sum `var' if simd20_sga==5
+		sum `var' if simd20_sga==5 & intake24==1
 		matrix meatconsumers[`r'+70,1]=r(N) 
 		
 		summ `var' if simd20_sga==5 & `var'==1
@@ -6595,7 +7257,7 @@ AVERAGE DAILY INTAKES OF DAIRY, per capita
 	matrix avgdairy = J(250, 7, .)
 	local r=2
 	
-quietly foreach var of varlist Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter {
+quietly foreach var of varlist Avg_Day_Dairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_Cream Avg_Day_Butter {
 	
 		*overall
 		sum `var'
@@ -6803,7 +7465,7 @@ AVERAGE DAILY INTAKES OF DAIRY, among consumers
 	matrix avgdairy = J(250, 7, .)
 	local r=2
 
-quietly foreach var of varlist Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_CreamDesserts Avg_Day_Butter {
+quietly foreach var of varlist Avg_Day_Dairy Avg_Day_Milk Avg_Day_Cheese Avg_Day_Yogurt Avg_Day_Cream Avg_Day_Butter {
 	
 		*overall
 		sum `var' if DairyConsumer==1
@@ -7005,12 +7667,13 @@ quietly foreach var of varlist Avg_Day_TotDairy Avg_Day_Milk Avg_Day_Cheese Avg_
 
 /*=============================================
 AVERAGE DAILY INTAKES OF DAIRY, % CONTRIBUTIONS	
+*Dairy types and food groups
 ===============================================*/
 
 	matrix propdairy = J(230, 4, .)
 	local r=2
 
-quietly foreach var of varlist Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_CreamDesserts Prop_Avg_Day_Butter {
+quietly foreach var of varlist Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Day_Yogurt Prop_Avg_Day_Cream Prop_Avg_Day_Butter {
 			
 		*overall		
 		sum `var'
@@ -7115,3 +7778,222 @@ quietly foreach var of varlist Prop_Avg_Day_Milk Prop_Avg_Day_Cheese Prop_Avg_Da
 	putexcel D1="SD"
 
 
+	
+*Dairy contributions - MAIN FOOD GROUP
+	matrix propdairyMFG = J(2500, 4, .)
+	local r=2
+
+	quietly foreach var of varlist Prop_Avg_Dairyg_1- Prop_Avg_Dairyg_66 {
+			
+		*overall		
+		sum `var'
+		matrix propdairyMFG[`r',1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var'
+		estat sd
+		matrix propdairyMFG[`r',2]=r(mean)
+		matrix propdairyMFG[`r',3]=r(sd)
+
+		*by sex
+		sum `var' if Sex==2 & DairyConsumer==1
+		matrix propdairyMFG[`r'+65,1]=r(N) 
+		
+		sum `var' if Sex==1 & DairyConsumer==1
+		matrix propdairyMFG[`r'+130,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(Sex)
+		estat sd
+		matrix propdairyMFG[`r'+65,2]=r(mean)[1,2] 
+		matrix propdairyMFG[`r'+65,3]=r(sd)[1,2]
+		matrix propdairyMFG[`r'+130,2]=r(mean)[1,1] 
+		matrix propdairyMFG[`r'+130,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 & DairyConsumer==1
+		matrix propdairyMFG[`r'+195,1]=r(N)
+		
+		sum `var' if age_cat==2 & DairyConsumer==1
+		matrix propdairyMFG[`r'+260,1]=r(N)
+		
+		sum `var' if age_cat==3 & DairyConsumer==1
+		matrix propdairyMFG[`r'+325,1]=r(N)
+		
+		sum `var' if age_cat==4 & DairyConsumer==1
+		matrix propdairyMFG[`r'+390,1]=r(N)
+		
+		sum `var' if age_cat==5 & DairyConsumer==1
+		matrix propdairyMFG[`r'+455,1]=r(N)
+		
+		sum `var' if age_cat==6 & DairyConsumer==1
+		matrix propdairyMFG[`r'+520,1]=r(N)
+		
+		sum `var' if age_cat==7 & DairyConsumer==1
+		matrix propdairyMFG[`r'+585,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(age_cat)
+		estat sd
+		matrix propdairyMFG[`r'+195,2]=r(mean)[1,1] 
+		matrix propdairyMFG[`r'+195,3]=r(sd)[1,1] 
+		matrix propdairyMFG[`r'+260,2]=r(mean)[1,2] 
+		matrix propdairyMFG[`r'+260,3]=r(sd)[1,2] 
+		matrix propdairyMFG[`r'+325,2]=r(mean)[1,3] 
+		matrix propdairyMFG[`r'+325,3]=r(sd)[1,3]	
+		matrix propdairyMFG[`r'+390,2]=r(mean)[1,4] 
+		matrix propdairyMFG[`r'+390,3]=r(sd)[1,4]	
+		matrix propdairyMFG[`r'+455,2]=r(mean)[1,5] 
+		matrix propdairyMFG[`r'+455,3]=r(sd)[1,5]	
+		matrix propdairyMFG[`r'+520,2]=r(mean)[1,6] 
+		matrix propdairyMFG[`r'+520,3]=r(sd)[1,6]	
+		matrix propdairyMFG[`r'+585,2]=r(mean)[1,7] 
+		matrix propdairyMFG[`r'+585,3]=r(sd)[1,7]
+	
+		
+		*By SIMD		
+		sum `var' if simd20_sga==1 & DairyConsumer==1
+		matrix propdairyMFG[`r'+650,1]=r(N)
+		
+		sum `var' if simd20_sga==2 & DairyConsumer==1
+		matrix propdairyMFG[`r'+715,1]=r(N)
+		
+		sum `var' if simd20_sga==3 & DairyConsumer==1
+		matrix propdairyMFG[`r'+780,1]=r(N)
+		
+		sum `var' if simd20_sga==4 & DairyConsumer==1
+		matrix propdairyMFG[`r'+845,1]=r(N)
+		
+		sum `var' if simd20_sga==5 & DairyConsumer==1
+		matrix propdairyMFG[`r'+910,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(simd20_sga)
+		estat sd
+		matrix propdairyMFG[`r'+650,2]=r(mean)[1,1] 
+		matrix propdairyMFG[`r'+650,3]=r(sd)[1,1] 
+		matrix propdairyMFG[`r'+715,2]=r(mean)[1,2] 
+		matrix propdairyMFG[`r'+715,3]=r(sd)[1,2] 
+		matrix propdairyMFG[`r'+780,2]=r(mean)[1,3] 
+		matrix propdairyMFG[`r'+780,3]=r(sd)[1,3]
+		matrix propdairyMFG[`r'+845,2]=r(mean)[1,4] 
+		matrix propdairyMFG[`r'+845,3]=r(sd)[1,4]
+		matrix propdairyMFG[`r'+910,2]=r(mean)[1,5] 
+		matrix propdairyMFG[`r'+910,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+
+*Export to Excel
+	putexcel set "$output\SHeS Dairy Intakes_Manuscript.xlsx", sheet("Dairy - main food groups") modify
+	putexcel B2=matrix(propdairyMFG)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+
+	
+*Meat contributions - SUB FOOD GROUP
+	matrix propdairySFG = J(5100, 4, .)
+	local r=2
+
+	quietly foreach var of varlist Prop_Avg_Dairyg_10R- Prop_Avg_Dairyg_9H {
+			
+		*overall		
+		sum `var'
+		matrix propdairySFG[`r',1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var'
+		estat sd
+		matrix propdairySFG[`r',2]=r(mean)
+		matrix propdairySFG[`r',3]=r(sd)		
+
+		*by sex
+		sum `var' if Sex==2 & DairyConsumer==1
+		matrix propdairySFG[`r'+145,1]=r(N) 
+		
+		sum `var' if Sex==1 & DairyConsumer==1
+		matrix propdairySFG[`r'+290,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(Sex)
+		estat sd
+		matrix propdairySFG[`r'+145,2]=r(mean)[1,2] 
+		matrix propdairySFG[`r'+145,3]=r(sd)[1,2]
+		matrix propdairySFG[`r'+290,2]=r(mean)[1,1] 
+		matrix propdairySFG[`r'+290,3]=r(sd)[1,1]
+		
+		*by age
+		sum `var' if age_cat==1 & DairyConsumer==1
+		matrix propdairySFG[`r'+435,1]=r(N)
+		
+		sum `var' if age_cat==2 & DairyConsumer==1
+		matrix propdairySFG[`r'+580,1]=r(N)
+		
+		sum `var' if age_cat==3 & DairyConsumer==1
+		matrix propdairySFG[`r'+725,1]=r(N)
+		
+		sum `var' if age_cat==4 & DairyConsumer==1
+		matrix propdairySFG[`r'+870,1]=r(N)
+		
+		sum `var' if age_cat==5 & DairyConsumer==1
+		matrix propdairySFG[`r'+1015,1]=r(N)
+		
+		sum `var' if age_cat==6 & DairyConsumer==1
+		matrix propdairySFG[`r'+1160,1]=r(N)
+		
+		sum `var' if age_cat==7 & DairyConsumer==1
+		matrix propdairySFG[`r'+1305,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(age_cat)
+		estat sd
+		matrix propdairySFG[`r'+435,2]=r(mean)[1,1] 
+		matrix propdairySFG[`r'+435,3]=r(sd)[1,1] 
+		matrix propdairySFG[`r'+580,2]=r(mean)[1,2] 
+		matrix propdairySFG[`r'+580,3]=r(sd)[1,2] 
+		matrix propdairySFG[`r'+725,2]=r(mean)[1,3] 
+		matrix propdairySFG[`r'+725,3]=r(sd)[1,3]	
+		matrix propdairySFG[`r'+870,2]=r(mean)[1,4] 
+		matrix propdairySFG[`r'+870,3]=r(sd)[1,4]	
+		matrix propdairySFG[`r'+1015,2]=r(mean)[1,5] 
+		matrix propdairySFG[`r'+1015,3]=r(sd)[1,5]	
+		matrix propdairySFG[`r'+1160,2]=r(mean)[1,6] 
+		matrix propdairySFG[`r'+1160,3]=r(sd)[1,6]	
+		matrix propdairySFG[`r'+1305,2]=r(mean)[1,7] 
+		matrix propdairySFG[`r'+1305,3]=r(sd)[1,7]
+		
+		
+		*By SIMD		
+		sum `var' if simd20_sga==1 & DairyConsumer==1
+		matrix propdairySFG[`r'+1450,1]=r(N)
+		
+		sum `var' if simd20_sga==2 & DairyConsumer==1
+		matrix propdairySFG[`r'+1595,1]=r(N)
+		
+		sum `var' if simd20_sga==3 & DairyConsumer==1
+		matrix propdairySFG[`r'+1740,1]=r(N)
+		
+		sum `var' if simd20_sga==4 & DairyConsumer==1
+		matrix propdairySFG[`r'+1885,1]=r(N)
+		
+		sum `var' if simd20_sga==5 & DairyConsumer==1
+		matrix propdairySFG[`r'+2030,1]=r(N)
+		
+		svy, subpop(DairyConsumer): mean `var', over(simd20_sga)
+		estat sd
+		matrix propdairySFG[`r'+1450,2]=r(mean)[1,1] 
+		matrix propdairySFG[`r'+1450,3]=r(sd)[1,1] 
+		matrix propdairySFG[`r'+1595,2]=r(mean)[1,2] 
+		matrix propdairySFG[`r'+1595,3]=r(sd)[1,2] 
+		matrix propdairySFG[`r'+1740,2]=r(mean)[1,3] 
+		matrix propdairySFG[`r'+1740,3]=r(sd)[1,3]
+		matrix propdairySFG[`r'+1885,2]=r(mean)[1,4] 
+		matrix propdairySFG[`r'+1885,3]=r(sd)[1,4]
+		matrix propdairySFG[`r'+2030,2]=r(mean)[1,5] 
+		matrix propdairySFG[`r'+2030,3]=r(sd)[1,5]	
+		
+		local r=`r'+1
+}	
+
+*Export to Excel
+	putexcel set "$output\SHeS Dairy Intakes_Manuscript.xlsx", sheet("Dairy - sub food groups") modify
+	putexcel B2=matrix(propdairySFG)
+	putexcel B1="N" 
+	putexcel C1="Mean"
+	putexcel D1="SD"
+	
