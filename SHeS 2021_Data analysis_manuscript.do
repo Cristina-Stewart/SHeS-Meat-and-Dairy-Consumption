@@ -1,7 +1,7 @@
 
 
 ************************************************************************************
-*Manuscript: "Meat and milk product consumption in Scottish adults: Insights from a national survey"
+*Manuscript: "Meat and dairy consumption in Scottish adults: Insights from a national survey"
 
 *Data analysis do-file for the manuscript 
 ************************************************************************************
